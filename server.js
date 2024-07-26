@@ -6,6 +6,13 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+const shipTiers = [
+  { name: 'Scout', health: 100, damage: 10, expToNextLevel: 100 },
+  { name: 'Fighter', health: 150, damage: 15, expToNextLevel: 250 },
+  { name: 'Destroyer', health: 200, damage: 20, expToNextLevel: 500 },
+  { name: 'Battleship', health: 300, damage: 30, expToNextLevel: Infinity }
+];
+
 const players = new Map();
 let nextPlayerId = 1;
 
@@ -16,7 +23,10 @@ wss.on('connection', (ws) => {
     x: Math.random() * 800,
     y: Math.random() * 600,
     angle: 0,
-    health: 100
+    tier: 0,
+    exp: 0,
+    health: shipTiers[0].health,
+    damage: shipTiers[0].damage
   };
   players.set(ws, player);
 
@@ -27,7 +37,7 @@ wss.on('connection', (ws) => {
       player.y = data.y;
       player.angle = data.angle;
     } else if (data.type === 'shoot') {
-      // Handle shooting logic here
+      handleShooting(player);
     }
     broadcastGameState();
   });
@@ -39,6 +49,16 @@ wss.on('connection', (ws) => {
 
   broadcastGameState();
 });
+
+function handleShooting(player) {
+  // Simplified shooting logic: award exp for each shot
+  player.exp += 10;
+  if (player.exp >= shipTiers[player.tier].expToNextLevel && player.tier < shipTiers.length - 1) {
+    player.tier++;
+    player.health = shipTiers[player.tier].health;
+    player.damage = shipTiers[player.tier].damage;
+  }
+}
 
 function broadcastGameState() {
   const gameState = Array.from(players.values());

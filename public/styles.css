@@ -6,8 +6,42 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+#gameContainer {
+    position: relative;
 }
 
 #gameCanvas {
     border: 1px solid #fff;
+}
+
+#levelUpUI {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#levelInfo, #shipName {
+    margin-bottom: 5px;
+}
+
+#expBarContainer {
+    width: 100px;
+    height: 10px;
+    background-color: #333;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#expBar {
+    height: 100%;
+    background-color: #0f0;
+    width: 0;
+    transition: width 0.3s ease-in-out;
 }

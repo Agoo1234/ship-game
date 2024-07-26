@@ -9,23 +9,31 @@ const ws = new WebSocket(`ws://${window.location.host}`);
 let players = [];
 let localPlayer = null;
 
+const shipTiers = [
+  { name: 'Scout', color: '#fff' },
+  { name: 'Fighter', color: '#ff0' },
+  { name: 'Destroyer', color: '#0ff' },
+  { name: 'Battleship', color: '#f0f' }
+];
+
 ws.onmessage = (event) => {
     players = JSON.parse(event.data);
     if (!localPlayer) {
         localPlayer = players.find(p => p.id === players[players.length - 1].id);
     }
+    updateLevelUI();
 };
 
-function drawShip(x, y, angle) {
+function drawShip(player) {
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(angle);
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.angle);
     ctx.beginPath();
     ctx.moveTo(0, -15);
     ctx.lineTo(-10, 10);
     ctx.lineTo(10, 10);
     ctx.closePath();
-    ctx.strokeStyle = '#fff';
+    ctx.strokeStyle = shipTiers[player.tier].color;
     ctx.stroke();
     ctx.restore();
 }
@@ -35,10 +43,30 @@ function gameLoop() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     players.forEach(player => {
-        drawShip(player.x, player.y, player.angle);
+        drawShip(player);
     });
 
     requestAnimationFrame(gameLoop);
+}
+
+function updateLevelUI() {
+    if (localPlayer) {
+        const levelInfo = document.getElementById('levelInfo');
+        const expBar = document.getElementById('expBar');
+        const shipName = document.getElementById('shipName');
+
+        levelInfo.textContent = `Level: ${localPlayer.tier + 1}`;
+        shipName.textContent = `Ship: ${shipTiers[localPlayer.tier].name}`;
+
+        const currentTier = shipTiers[localPlayer.tier];
+        const nextTier = shipTiers[localPlayer.tier + 1];
+        if (nextTier) {
+            const progress = (localPlayer.exp - currentTier.expToNextLevel) / (nextTier.expToNextLevel - currentTier.expToNextLevel) * 100;
+            expBar.style.width = `${progress}%`;
+        } else {
+            expBar.style.width = '100%';
+        }
+    }
 }
 
 canvas.addEventListener('mousemove', (event) => {
