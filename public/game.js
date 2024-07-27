@@ -21,12 +21,13 @@ const shipTiers = [
 const SPEED = 5;
 
 ws.onmessage = (event) => {
-    const gameState = JSON.parse(event.data);
-    if (gameState.type === 'dead') {
+    const data = JSON.parse(event.data);
+    if (data.type === 'dead') {
         showDeathScreen();
-    } else {
-        players = gameState.players;
-        stars = gameState.stars;
+    } else if (data.type === 'gameState') {
+        players = data.players;
+        stars = data.stars;
+        bullets = data.bullets;
         if (!localPlayer) {
             localPlayer = players.find(p => p.id === players[players.length - 1].id);
         } else {
@@ -70,7 +71,9 @@ function gameLoop() {
 
     stars.forEach(star => drawStar(star));
     players.forEach(player => drawShip(player));
-    bullets.forEach(bullet => drawBullet(bullet));
+    if (bullets && bullets.length > 0) {
+        bullets.forEach(bullet => drawBullet(bullet));
+    }
 
     requestAnimationFrame(gameLoop);
 }

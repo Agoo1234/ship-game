@@ -156,6 +156,7 @@ function checkBulletCollisions(bullet) {
 
 function broadcastGameState() {
   const gameState = {
+    type: 'gameState',
     players: Array.from(players.values()),
     stars: stars,
     bullets: bullets
