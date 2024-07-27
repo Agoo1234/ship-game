@@ -245,7 +245,7 @@ function drawStar(star) {
 }
 
 function isOnScreen(object) {
-    const margin = 50; // Increased margin to account for player size
+    const margin = 100; // Increased margin to account for player size and ensure visibility near screen edges
     return object.x >= camera.x - margin && object.x <= camera.x + camera.width + margin &&
            object.y >= camera.y - margin && object.y <= camera.y + camera.height + margin;
 }
