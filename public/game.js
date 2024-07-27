@@ -1,5 +1,3 @@
-import { SPEED, MAP, SHIP_TIERS, BULLET_SPEED, MINIMAP_SIZE, LEVEL_UP_MESSAGE_DURATION } from './constants.js';
-
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 

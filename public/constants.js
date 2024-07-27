@@ -20,11 +20,10 @@ const BULLET_SPEED = 10;
 const MINIMAP_SIZE = 150;
 const LEVEL_UP_MESSAGE_DURATION = 180; // 3 seconds at 60 fps
 
-module.exports = {
-    SPEED,
-    MAP,
-    SHIP_TIERS,
-    BULLET_SPEED,
-    MINIMAP_SIZE,
-    LEVEL_UP_MESSAGE_DURATION
-};
+// Make constants available globally
+window.SPEED = SPEED;
+window.MAP = MAP;
+window.SHIP_TIERS = SHIP_TIERS;
+window.BULLET_SPEED = BULLET_SPEED;
+window.MINIMAP_SIZE = MINIMAP_SIZE;
+window.LEVEL_UP_MESSAGE_DURATION = LEVEL_UP_MESSAGE_DURATION;

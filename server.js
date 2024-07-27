@@ -220,7 +220,7 @@ setInterval(() => {
   broadcastGameState();
 }, 1000 / 60); // 60 FPS
 
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
