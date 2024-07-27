@@ -1,6 +1,5 @@
 // Import constants from the global GAME_CONSTANTS object or use fallback values
 // const {
-//     SPEED = 5,
 //     MAP = { width: 4000, height: 3000 },
 //     SHIP_TIERS = [
 //         { name: 'Scout', color: '#fff', health: 100, trait: 'Fast Reload', expToNextLevel: 100 },
@@ -14,6 +13,8 @@
 //     MINIMAP_SIZE = 150,
 //     LEVEL_UP_MESSAGE_DURATION = 180
 // } = window.GAME_CONSTANTS || {};
+
+const SPEED = 3; // Reduced speed from 5 to 3
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
