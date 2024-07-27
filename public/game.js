@@ -369,19 +369,19 @@ function handleMovement() {
         const dy = mousePosition.y - localPlayer.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Always move towards the last known mouse position
-        const moveX = (dx / Math.max(distance, 1)) * SPEED;
-        const moveY = (dy / Math.max(distance, 1)) * SPEED;
+        // Calculate the movement vector
+        const moveX = (dx / distance) * SPEED;
+        const moveY = (dy / distance) * SPEED;
 
-        let newX = localPlayer.x + moveX;
-        let newY = localPlayer.y + moveY;
+        // Update the player's position
+        localPlayer.x += moveX;
+        localPlayer.y += moveY;
 
         // Prevent the ship from going past the edge of the map
-        newX = Math.max(20, Math.min(newX, MAP.width - 20));
-        newY = Math.max(20, Math.min(newY, MAP.height - 20));
+        localPlayer.x = Math.max(20, Math.min(localPlayer.x, MAP.width - 20));
+        localPlayer.y = Math.max(20, Math.min(localPlayer.y, MAP.height - 20));
 
-        localPlayer.x = newX;
-        localPlayer.y = newY;
+        // Send the updated position to the server
         ws.send(JSON.stringify({
             type: 'move',
             x: localPlayer.x,
