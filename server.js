@@ -11,6 +11,7 @@ const players = new Map();
 let nextPlayerId = 1;
 let stars = [];
 let bullets = [];
+const SHIELD_REGENERATION_DELAY = 10000; // 10 seconds in milliseconds
 
 function generateStars() {
   stars = [];
@@ -43,7 +44,8 @@ wss.on('connection', (ws) => {
         damage: SHIP_TIERS[0].damage,
         lastShot: 0,
         trait: SHIP_TIERS[0].trait,
-        shieldHealth: 0
+        shieldHealth: 0,
+        lastHitTime: Date.now()
       };
       players.set(ws, player);
       broadcastGameState();
@@ -253,6 +255,9 @@ function handleDamage(player, damage, ws) {
     }));
   }
   
+  // Reset shield regeneration timer
+  player.lastHitTime = Date.now();
+  
   broadcastGameState(); // Ensure all clients are updated after damage
   return true; // The bullet hit the player
 }
@@ -266,6 +271,7 @@ function respawnPlayer(player, ws) {
   player.damage = SHIP_TIERS[0].damage;
   player.trait = SHIP_TIERS[0].trait;
   player.shieldHealth = 0;
+  player.lastHitTime = Date.now();
 
   console.log(`Player ${player.username} has respawned`);
   ws.send(JSON.stringify({ 
@@ -297,8 +303,23 @@ function broadcastGameState() {
   });
 }
 
+function regenerateShields() {
+  const now = Date.now();
+  players.forEach((player) => {
+    if (player.trait === 'Shield' || player.trait === 'All Traits') {
+      if (now - player.lastHitTime >= SHIELD_REGENERATION_DELAY) {
+        const maxShieldHealth = 50; // Adjust this value as needed
+        if (player.shieldHealth < maxShieldHealth) {
+          player.shieldHealth = Math.min(player.shieldHealth + 1, maxShieldHealth);
+        }
+      }
+    }
+  });
+}
+
 setInterval(() => {
   updateBullets();
+  regenerateShields();
   broadcastGameState();
 }, 1000 / 60); // 60 FPS
 
