@@ -194,6 +194,11 @@ function checkBulletCollisions(bullet) {
 }
 
 function handleDamage(player, damage, ws) {
+  if (!damage || isNaN(damage)) {
+    console.error(`Invalid damage value for player ${player.username}`);
+    return;
+  }
+
   if (player.trait === 'Shield' && Math.random() < 0.3) {
     console.log(`Shield blocked damage for player ${player.username}`);
     return; // 30% chance to completely block damage
@@ -214,7 +219,8 @@ function handleDamage(player, damage, ws) {
   if (player.health <= 0) {
     console.log(`Player ${player.username} has died`);
     ws.send(JSON.stringify({ type: 'dead' }));
-    respawnPlayer(player, ws);
+    players.delete(ws);
+    broadcastGameState();
   } else {
     ws.send(JSON.stringify({ 
       type: 'hit', 
