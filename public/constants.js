@@ -1,12 +1,12 @@
 // Game constants
-export const SPEED = 5;
-export const MAP = {
+const SPEED = 5;
+const MAP = {
     width: 4000,
     height: 3000
 };
 
 // Ship tiers
-export const SHIP_TIERS = [
+const SHIP_TIERS = [
     { name: 'Scout', color: '#fff', health: 100, trait: 'Fast Reload', expToNextLevel: 100 },
     { name: 'Fighter', color: '#ff0', health: 150, trait: 'Double Shot', expToNextLevel: 250 },
     { name: 'Destroyer', color: '#0ff', health: 200, trait: 'Shield', expToNextLevel: 500 },
@@ -16,6 +16,15 @@ export const SHIP_TIERS = [
 ];
 
 // Other constants
-export const BULLET_SPEED = 10;
-export const MINIMAP_SIZE = 150;
-export const LEVEL_UP_MESSAGE_DURATION = 180; // 3 seconds at 60 fps
+const BULLET_SPEED = 10;
+const MINIMAP_SIZE = 150;
+const LEVEL_UP_MESSAGE_DURATION = 180; // 3 seconds at 60 fps
+
+module.exports = {
+    SPEED,
+    MAP,
+    SHIP_TIERS,
+    BULLET_SPEED,
+    MINIMAP_SIZE,
+    LEVEL_UP_MESSAGE_DURATION
+};
