@@ -14,6 +14,7 @@ let players = [];
 let stars = [];
 let localPlayer = null;
 let keys = {};
+let username = '';
 
 const shipTiers = [
   { name: 'Scout', color: '#fff', health: 100 },
@@ -25,18 +26,22 @@ const shipTiers = [
 const SPEED = 5;
 
 startButton.addEventListener('click', () => {
-    const username = usernameInput.value.trim();
+    username = usernameInput.value.trim();
     if (username) {
-        startGame(username);
+        startGame();
     } else {
         alert('Please enter a username');
     }
 });
 
-function startGame(username) {
+function startGame() {
     introScreen.style.display = 'none';
     gameContainer.style.display = 'block';
 
+    connectWebSocket();
+}
+
+function connectWebSocket() {
     ws = new WebSocket(window.location.protocol === 'file:' ? 'ws://localhost:3000' : `ws://${window.location.host}`);
 
     ws.onopen = () => {
@@ -223,9 +228,18 @@ function showDeathScreen() {
     deathScreen.id = 'deathScreen';
     deathScreen.innerHTML = `
         <h1>You Died!</h1>
-        <button onclick="location.reload()">Restart</button>
+        <button id="restartButton">Restart</button>
     `;
     document.body.appendChild(deathScreen);
+
+    document.getElementById('restartButton').addEventListener('click', () => {
+        document.body.removeChild(deathScreen);
+        localPlayer = null;
+        players = [];
+        stars = [];
+        bullets = [];
+        connectWebSocket();
+    });
 }
 
 gameLoop();
