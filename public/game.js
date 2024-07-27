@@ -256,6 +256,8 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+// Make sure there are no extra closing braces here
+
 function showDisconnectScreen() {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
