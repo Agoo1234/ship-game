@@ -152,13 +152,15 @@ function drawFighter() {
 }
 
 function drawDestroyer() {
-    // Draw the shield
-    ctx.globalAlpha = 0.3;
-    ctx.beginPath();
-    ctx.arc(0, 0, 35, 0, Math.PI * 2);
-    ctx.fillStyle = '#00FFFF';
-    ctx.fill();
-    ctx.globalAlpha = 1.0;
+    // Draw the shield if it's active
+    if (localPlayer.shieldHealth > 0) {
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath();
+        ctx.arc(0, 0, 35, 0, Math.PI * 2);
+        ctx.fillStyle = '#00FFFF';
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+    }
 
     // Draw the ship
     ctx.beginPath();
@@ -263,10 +265,18 @@ function updateLevelUI() {
         const expBar = document.getElementById('expBar');
         const shipName = document.getElementById('shipName');
         const healthInfo = document.getElementById('healthInfo');
+        const shieldInfo = document.getElementById('shieldInfo');
 
         levelInfo.textContent = `Level: ${localPlayer.tier + 1}`;
         shipName.textContent = `Ship: ${shipTiers[localPlayer.tier].name} (${shipTiers[localPlayer.tier].trait})`;
         healthInfo.textContent = `Health: ${Math.max(0, Math.round(localPlayer.health))}`;
+        
+        if (localPlayer.shieldHealth > 0) {
+            shieldInfo.textContent = `Shield: ${Math.max(0, Math.round(localPlayer.shieldHealth))}`;
+            shieldInfo.style.display = 'block';
+        } else {
+            shieldInfo.style.display = 'none';
+        }
 
         const currentTier = shipTiers[localPlayer.tier];
         const nextTier = shipTiers[localPlayer.tier + 1];

@@ -9,10 +9,10 @@ const wss = new WebSocket.Server({ server });
 const shipTiers = [
   { name: 'Scout', health: 100, damage: 10, expToNextLevel: 100, trait: 'fastReload' },
   { name: 'Fighter', health: 150, damage: 15, expToNextLevel: 250, trait: 'doubleBullet' },
-  { name: 'Destroyer', health: 200, damage: 20, expToNextLevel: 500, trait: 'shield' },
+  { name: 'Destroyer', health: 200, damage: 20, expToNextLevel: 500, trait: 'shield', shieldHealth: 100 },
   { name: 'Battleship', health: 300, damage: 30, expToNextLevel: 1000, trait: 'heavyBullet' },
   { name: 'Dreadnought', health: 500, damage: 40, expToNextLevel: 2000, trait: 'rearShot' },
-  { name: 'Titan', health: 1000, damage: 50, expToNextLevel: Infinity, trait: 'allTraits' }
+  { name: 'Titan', health: 1000, damage: 50, expToNextLevel: Infinity, trait: 'allTraits', shieldHealth: 200 }
 ];
 
 const players = new Map();
@@ -49,7 +49,8 @@ wss.on('connection', (ws) => {
         health: shipTiers[0].health,
         damage: shipTiers[0].damage,
         lastShot: 0,
-        trait: shipTiers[0].trait
+        trait: shipTiers[0].trait,
+        shieldHealth: 0
       };
       players.set(ws, player);
       broadcastGameState();
@@ -184,10 +185,23 @@ function checkBulletCollisions(bullet) {
       const dy = targetPlayer.y - bullet.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       if (distance < 20) {
-        targetPlayer.health -= bullet.damage;
+        if (targetPlayer.shieldHealth > 0) {
+          targetPlayer.shieldHealth -= bullet.damage;
+          if (targetPlayer.shieldHealth <= 0) {
+            targetPlayer.shieldHealth = 0;
+          }
+        } else {
+          targetPlayer.health -= bullet.damage;
+        }
         if (targetPlayer.health <= 0) {
           ws.send(JSON.stringify({ type: 'dead' }));
           players.delete(ws);
+        } else {
+          ws.send(JSON.stringify({ 
+            type: 'hit', 
+            health: targetPlayer.health, 
+            shieldHealth: targetPlayer.shieldHealth 
+          }));
         }
       }
     }
