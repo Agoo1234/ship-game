@@ -141,29 +141,32 @@ function updateBullets() {
     }
     
     let hit = false;
-    players.forEach((player, ws) => {
+    for (const [ws, player] of players.entries()) {
       if (player.id !== bullet.playerId) {
         const dx = player.x - bullet.x;
         const dy = player.y - bullet.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < 20) {
           hit = handleDamage(player, bullet.damage, ws);
-          const shooter = Array.from(players.values()).find(p => p.id === bullet.playerId);
-          if (shooter) {
-            if (player.health <= 0) {
-              shooter.exp += 50; // Give XP for killing a player
-              if (shooter.exp >= SHIP_TIERS[shooter.tier].expToNextLevel && shooter.tier < SHIP_TIERS.length - 1) {
-                handleLevelUp(shooter);
-                const shooterWs = Array.from(players.entries()).find(([_, p]) => p.id === shooter.id)[0];
-                shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: SHIP_TIERS[shooter.tier].name }));
+          if (hit) {
+            const shooter = Array.from(players.values()).find(p => p.id === bullet.playerId);
+            if (shooter) {
+              if (player.health <= 0) {
+                shooter.exp += 50; // Give XP for killing a player
+                if (shooter.exp >= SHIP_TIERS[shooter.tier].expToNextLevel && shooter.tier < SHIP_TIERS.length - 1) {
+                  handleLevelUp(shooter);
+                  const shooterWs = Array.from(players.entries()).find(([_, p]) => p.id === shooter.id)[0];
+                  shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: SHIP_TIERS[shooter.tier].name }));
+                }
               }
+              // Always give some XP for hitting a player
+              shooter.exp += 5;
             }
-            // Always give some XP for hitting a player
-            shooter.exp += 5;
+            return false; // Remove the bullet
           }
         }
       }
-    });
+    }
     
     return !hit;
   });
