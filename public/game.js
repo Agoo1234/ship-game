@@ -380,8 +380,8 @@ function shoot() {
 canvas.addEventListener('mousemove', (event) => {
     if (localPlayer) {
         const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+        const x = event.clientX - rect.left + camera.x;
+        const y = event.clientY - rect.top + camera.y;
         localPlayer.angle = Math.atan2(y - localPlayer.y, x - localPlayer.x);
 
         ws.send(JSON.stringify({
