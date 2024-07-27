@@ -116,7 +116,9 @@ function handleShooting(player, data) {
 
     if (player.trait === 'doubleBullet' || player.trait === 'allTraits') {
       bullets.push({...bulletData, angle: bulletData.angle + Math.PI / 12});
-      bullets.push({...bulletData, angle: bulletData.angle - Math.PI / 12});
+      setTimeout(() => {
+        bullets.push({...bulletData, angle: bulletData.angle - Math.PI / 12});
+      }, 100); // 100ms delay for the second bullet
     }
 
     if (player.trait === 'rearShot' || player.trait === 'allTraits') {
