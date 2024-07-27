@@ -152,6 +152,15 @@ function drawFighter() {
 }
 
 function drawDestroyer() {
+    // Draw the shield
+    ctx.globalAlpha = 0.3;
+    ctx.beginPath();
+    ctx.arc(0, 0, 35, 0, Math.PI * 2);
+    ctx.fillStyle = '#00FFFF';
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    // Draw the ship
     ctx.beginPath();
     ctx.moveTo(25, 0);
     ctx.lineTo(10, 15);
@@ -160,6 +169,7 @@ function drawDestroyer() {
     ctx.lineTo(-20, -5);
     ctx.lineTo(10, -15);
     ctx.closePath();
+    ctx.fillStyle = shipTiers[2].color; // Destroyer color
     ctx.fill();
     ctx.stroke();
 }
