@@ -292,7 +292,7 @@ function showDisconnectScreen() {
     drawMinimap();
 
     requestAnimationFrame(gameLoop);
-}
+
 
 function updateCamera() {
     if (localPlayer) {
