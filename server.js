@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const http = require('http');
 const express = require('express');
-const { MAP, SHIP_TIERS } = require('./public/constants.js');
+const { MAP, SHIP_TIERS, BULLET_SPEED } = require('./constants.js');
 
 const app = express();
 const server = http.createServer(app);
