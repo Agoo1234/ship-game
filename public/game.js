@@ -4,6 +4,18 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let camera = {
+    x: 0,
+    y: 0,
+    width: window.innerWidth,
+    height: window.innerHeight
+};
+
+let MAP = {
+    width: 4000,
+    height: 3000
+};
+
 const introScreen = document.getElementById('introScreen');
 const gameContainer = document.getElementById('gameContainer');
 const usernameInput = document.getElementById('usernameInput');
@@ -216,16 +228,28 @@ function drawTitan() {
 }
 
 function drawStar(star) {
-    ctx.fillStyle = 'yellow';
-    ctx.beginPath();
-    ctx.arc(star.x, star.y, 5, 0, Math.PI * 2);
-    ctx.fill();
+    if (isOnScreen(star)) {
+        ctx.fillStyle = 'yellow';
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function isOnScreen(object) {
+    return object.x >= camera.x - 20 && object.x <= camera.x + camera.width + 20 &&
+           object.y >= camera.y - 20 && object.y <= camera.y + camera.height + 20;
 }
 
 function gameLoop() {
     handleMovement();
+    updateCamera();
+    
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.translate(-camera.x, -camera.y);
 
     stars.forEach(star => drawStar(star));
     players.forEach(player => drawShip(player));
@@ -233,9 +257,47 @@ function gameLoop() {
         bullets.forEach(bullet => drawBullet(bullet));
     }
 
+    ctx.restore();
+
     drawLevelUpMessage();
+    drawMinimap();
 
     requestAnimationFrame(gameLoop);
+}
+
+function updateCamera() {
+    if (localPlayer) {
+        camera.x = localPlayer.x - canvas.width / 2;
+        camera.y = localPlayer.y - canvas.height / 2;
+
+        camera.x = Math.max(0, Math.min(camera.x, MAP.width - canvas.width));
+        camera.y = Math.max(0, Math.min(camera.y, MAP.height - canvas.height));
+    }
+}
+
+function drawMinimap() {
+    const minimapSize = 150;
+    const minimapScale = minimapSize / Math.max(MAP.width, MAP.height);
+    
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(canvas.width - minimapSize - 10, canvas.height - minimapSize - 10, minimapSize, minimapSize);
+    
+    players.forEach(player => {
+        ctx.fillStyle = player === localPlayer ? '#00ff00' : '#ff0000';
+        ctx.fillRect(
+            canvas.width - minimapSize - 10 + player.x * minimapScale,
+            canvas.height - minimapSize - 10 + player.y * minimapScale,
+            3, 3
+        );
+    });
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.strokeRect(
+        canvas.width - minimapSize - 10 + camera.x * minimapScale,
+        canvas.height - minimapSize - 10 + camera.y * minimapScale,
+        canvas.width * minimapScale,
+        canvas.height * minimapScale
+    );
 }
 
 let levelUpMessage = null;
@@ -302,9 +364,9 @@ function handleMovement() {
             let newX = localPlayer.x + dx;
             let newY = localPlayer.y + dy;
 
-            // Prevent the ship from going past the edge
-            newX = Math.max(20, Math.min(newX, canvas.width - 20));
-            newY = Math.max(20, Math.min(newY, canvas.height - 20));
+            // Prevent the ship from going past the edge of the map
+            newX = Math.max(20, Math.min(newX, MAP.width - 20));
+            newY = Math.max(20, Math.min(newY, MAP.height - 20));
 
             localPlayer.x = newX;
             localPlayer.y = newY;

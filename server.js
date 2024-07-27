@@ -6,10 +6,10 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// Define canvas dimensions
-const canvas = {
-  width: 1920,  // Adjust this value as needed
-  height: 1080  // Adjust this value as needed
+// Define map dimensions
+const MAP = {
+  width: 4000,
+  height: 3000
 };
 
 const shipTiers = [
@@ -48,8 +48,8 @@ wss.on('connection', (ws) => {
       const player = {
         id: playerId,
         username: data.username,
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
+        x: Math.random() * MAP.width,
+        y: Math.random() * MAP.height,
         angle: 0,
         tier: 0,
         exp: 0,
@@ -144,7 +144,7 @@ function updateBullets() {
     bullet.x += Math.cos(bullet.angle) * bullet.speed;
     bullet.y += Math.sin(bullet.angle) * bullet.speed;
     
-    if (bullet.x < 0 || bullet.x > 800 || bullet.y < 0 || bullet.y > 600) {
+    if (bullet.x < 0 || bullet.x > MAP.width || bullet.y < 0 || bullet.y > MAP.height) {
       return false;
     }
     
