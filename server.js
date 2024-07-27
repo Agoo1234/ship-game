@@ -144,21 +144,15 @@ function updateBullets() {
         const dy = player.y - bullet.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < 20) {
-          handleDamage(player, bullet.damage);
-          if (player.health <= 0) {
-            const shooter = Array.from(players.values()).find(p => p.id === bullet.playerId);
-            if (shooter) {
-              shooter.exp += 50; // Give XP for killing a player
-              if (shooter.exp >= SHIP_TIERS[shooter.tier].expToNextLevel && shooter.tier < SHIP_TIERS.length - 1) {
-                handleLevelUp(shooter);
-                const shooterWs = Array.from(players.entries()).find(([_, p]) => p.id === shooter.id)[0];
-                shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: SHIP_TIERS[shooter.tier].name }));
-              }
+          handleDamage(player, bullet.damage, ws);
+          const shooter = Array.from(players.values()).find(p => p.id === bullet.playerId);
+          if (shooter && player.health <= 0) {
+            shooter.exp += 50; // Give XP for killing a player
+            if (shooter.exp >= SHIP_TIERS[shooter.tier].expToNextLevel && shooter.tier < SHIP_TIERS.length - 1) {
+              handleLevelUp(shooter);
+              const shooterWs = Array.from(players.entries()).find(([_, p]) => p.id === shooter.id)[0];
+              shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: SHIP_TIERS[shooter.tier].name }));
             }
-            ws.send(JSON.stringify({ type: 'dead' }));
-            players.delete(ws);
-          } else {
-            ws.send(JSON.stringify({ type: 'hit', id: player.id, health: player.health, shieldHealth: player.shieldHealth }));
           }
           hit = true;
         }
@@ -199,7 +193,7 @@ function checkBulletCollisions(bullet) {
   });
 }
 
-function handleDamage(player, damage) {
+function handleDamage(player, damage, ws) {
   if (player.trait === 'Shield' && Math.random() < 0.3) {
     console.log(`Shield blocked damage for player ${player.username}`);
     return; // 30% chance to completely block damage
@@ -216,6 +210,36 @@ function handleDamage(player, damage) {
   }
 
   console.log(`Player ${player.username} took ${damage} damage. Health: ${player.health}, Shield: ${player.shieldHealth}`);
+
+  if (player.health <= 0) {
+    console.log(`Player ${player.username} has died`);
+    ws.send(JSON.stringify({ type: 'dead' }));
+    respawnPlayer(player, ws);
+  } else {
+    ws.send(JSON.stringify({ 
+      type: 'hit', 
+      id: player.id,
+      health: player.health, 
+      shieldHealth: player.shieldHealth 
+    }));
+  }
+}
+
+function respawnPlayer(player, ws) {
+  player.x = Math.random() * MAP.width;
+  player.y = Math.random() * MAP.height;
+  player.health = SHIP_TIERS[0].health;
+  player.tier = 0;
+  player.exp = 0;
+  player.damage = SHIP_TIERS[0].damage;
+  player.trait = SHIP_TIERS[0].trait;
+  player.shieldHealth = 0;
+
+  console.log(`Player ${player.username} has respawned`);
+  ws.send(JSON.stringify({ 
+    type: 'respawn', 
+    player: player 
+  }));
 }
 
 function handleLevelUp(player) {

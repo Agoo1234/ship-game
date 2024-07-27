@@ -63,10 +63,15 @@ function connectWebSocket() {
         } else if (data.type === 'hit') {
             if (localPlayer && data.id === localPlayer.id) {
                 localPlayer.health = data.health;
+                localPlayer.shieldHealth = data.shieldHealth;
                 updateLevelUI();
             }
         } else if (data.type === 'levelUp') {
             showLevelUpMessage(data.newTier, data.shipName);
+        } else if (data.type === 'respawn') {
+            localPlayer = data.player;
+            hideDeathScreen();
+            updateLevelUI();
         }
     };
 
@@ -438,3 +443,9 @@ function showDeathScreen() {
 }
 
 gameLoop();
+function hideDeathScreen() {
+    const deathScreen = document.getElementById('deathScreen');
+    if (deathScreen) {
+        document.body.removeChild(deathScreen);
+    }
+}
