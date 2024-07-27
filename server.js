@@ -333,7 +333,6 @@ function checkDisconnectedPlayers() {
   const now = Date.now();
   players.forEach((player, ws) => {
     if (now - player.lastActiveTime > DISCONNECT_TIMEOUT) {
-      ws.send(JSON.stringify({ type: 'disconnected' }));
       players.delete(ws);
     }
   });

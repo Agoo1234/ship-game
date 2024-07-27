@@ -65,9 +65,7 @@ function connectWebSocket() {
 
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === 'disconnected') {
-            showDisconnectScreen();
-        } else if (data.type === 'dead') {
+        if (data.type === 'dead') {
             showDeathScreen();
         } else if (data.type === 'gameState') {
             players = data.players;
@@ -278,27 +276,7 @@ function gameLoop() {
 
 // Make sure there are no extra closing braces here
 
-function showDisconnectScreen() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = 'white';
-    ctx.font = '30px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Disconnected from server', canvas.width / 2, canvas.height / 2 - 20);
-    ctx.fillText('Please refresh the page to reconnect', canvas.width / 2, canvas.height / 2 + 20);
-}
-
-function showDisconnectScreen() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = 'white';
-    ctx.font = '30px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Disconnected from server', canvas.width / 2, canvas.height / 2 - 20);
-    ctx.fillText('Please refresh the page to reconnect', canvas.width / 2, canvas.height / 2 + 20);
-}
+// Disconnect screen function removed
 
 function updateCamera() {
     if (localPlayer) {
