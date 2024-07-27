@@ -325,18 +325,10 @@ function regenerateShields() {
 setInterval(() => {
   updateBullets();
   regenerateShields();
-  checkDisconnectedPlayers();
   broadcastGameState();
 }, 1000 / 60); // 60 FPS
 
-function checkDisconnectedPlayers() {
-  const now = Date.now();
-  players.forEach((player, ws) => {
-    if (now - player.lastActiveTime > DISCONNECT_TIMEOUT) {
-      players.delete(ws);
-    }
-  });
-}
+
 
 app.use(express.static(__dirname + '/public'));
 
