@@ -22,10 +22,11 @@ let bullets = [];
 
 function generateStars() {
   stars = [];
-  for (let i = 0; i < 20; i++) {
+  const numStars = Math.floor((canvas.width * canvas.height) / 40000); // Adjust star density
+  for (let i = 0; i < numStars; i++) {
     stars.push({
-      x: Math.random() * 800,
-      y: Math.random() * 600,
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
       value: Math.floor(Math.random() * 20) + 10
     });
   }

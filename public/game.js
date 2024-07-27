@@ -1,8 +1,8 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 800;
-canvas.height = 600;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 const introScreen = document.getElementById('introScreen');
 const gameContainer = document.getElementById('gameContainer');
@@ -86,6 +86,16 @@ function drawShip(player) {
     ctx.fillStyle = color;
     ctx.strokeStyle = 'white';
 
+    // Draw the shield if it's active
+    if (player.shieldHealth > 0) {
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath();
+        ctx.arc(0, 0, 35, 0, Math.PI * 2);
+        ctx.fillStyle = '#00FFFF';
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+    }
+
     // Draw ship based on tier
     switch(player.tier) {
         case 0: // Scout
@@ -152,16 +162,6 @@ function drawFighter() {
 }
 
 function drawDestroyer() {
-    // Draw the shield if it's active
-    if (localPlayer.shieldHealth > 0) {
-        ctx.globalAlpha = 0.3;
-        ctx.beginPath();
-        ctx.arc(0, 0, 35, 0, Math.PI * 2);
-        ctx.fillStyle = '#00FFFF';
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
-    }
-
     // Draw the ship
     ctx.beginPath();
     ctx.moveTo(25, 0);
@@ -299,8 +299,15 @@ function handleMovement() {
         if (keys['d']) dx += SPEED;
 
         if (dx !== 0 || dy !== 0) {
-            localPlayer.x += dx;
-            localPlayer.y += dy;
+            let newX = localPlayer.x + dx;
+            let newY = localPlayer.y + dy;
+
+            // Prevent the ship from going past the edge
+            newX = Math.max(20, Math.min(newX, canvas.width - 20));
+            newY = Math.max(20, Math.min(newY, canvas.height - 20));
+
+            localPlayer.x = newX;
+            localPlayer.y = newY;
             ws.send(JSON.stringify({
                 type: 'move',
                 x: localPlayer.x,
@@ -360,6 +367,11 @@ window.addEventListener('keydown', (e) => {
 
 window.addEventListener('keyup', (e) => {
     keys[e.key.toLowerCase()] = false;
+});
+
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 });
 
 function showDeathScreen() {
