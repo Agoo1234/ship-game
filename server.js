@@ -103,18 +103,22 @@ function handleShooting(player, data) {
     const baseDamage = player.damage || SHIP_TIERS[player.tier].damage;
     const bulletDamage = player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? baseDamage * 1.5 : baseDamage;
     const finalDamage = Math.max(1, Math.round(bulletDamage)); // Ensure damage is at least 1 and rounded
+    
+    // Ensure finalDamage is a valid number
+    const validDamage = isNaN(finalDamage) ? 1 : finalDamage;
+    
     const bulletData = {
       x: data.x,
       y: data.y,
       angle: data.angle,
       speed: data.speed,
-      damage: finalDamage,
+      damage: validDamage,
       playerId: player.id,
       size: player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? 6 : 3
     };
     bullets.push(bulletData);
 
-    console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet with damage: ${finalDamage}`);
+    console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet with damage: ${validDamage}`);
 
     if (player.trait === 'Double Shot' || player.trait === 'All Traits') {
       console.log(`Double Shot trait activated for player ${player.username}`);
@@ -131,6 +135,12 @@ function handleShooting(player, data) {
 
 function updateBullets() {
   bullets = bullets.filter(bullet => {
+    // Skip processing if bullet has invalid damage
+    if (isNaN(bullet.damage) || bullet.damage <= 0) {
+      console.error(`Skipping bullet with invalid damage: ${bullet.damage}`);
+      return false;
+    }
+
     const dx = Math.cos(bullet.angle) * bullet.speed;
     const dy = Math.sin(bullet.angle) * bullet.speed;
     bullet.x += dx;
