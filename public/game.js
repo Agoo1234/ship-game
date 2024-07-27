@@ -280,20 +280,6 @@ function showDisconnectScreen() {
     ctx.fillText('Please refresh the page to reconnect', canvas.width / 2, canvas.height / 2 + 20);
 }
 
-    stars.forEach(star => drawStar(star));
-    players.forEach(player => drawShip(player));
-    if (bullets && bullets.length > 0) {
-        bullets.forEach(bullet => drawBullet(bullet));
-    }
-
-    ctx.restore();
-
-    drawLevelUpMessage();
-    drawMinimap();
-
-    requestAnimationFrame(gameLoop);
-}
-
 function updateCamera() {
     if (localPlayer) {
         camera.x = localPlayer.x - canvas.width / 2;
