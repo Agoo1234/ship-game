@@ -147,7 +147,7 @@ function updateBullets() {
         const dy = player.y - bullet.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < 20) {
-          handleDamage(player, bullet.damage, ws);
+          hit = handleDamage(player, bullet.damage, ws);
           const shooter = Array.from(players.values()).find(p => p.id === bullet.playerId);
           if (shooter) {
             if (player.health <= 0) {
@@ -161,7 +161,6 @@ function updateBullets() {
             // Always give some XP for hitting a player
             shooter.exp += 5;
           }
-          hit = true;
         }
       }
     });
@@ -203,12 +202,12 @@ function checkBulletCollisions(bullet) {
 function handleDamage(player, damage, ws) {
   if (!damage || isNaN(damage)) {
     console.error(`Invalid damage value for player ${player.username}`);
-    return;
+    return false;
   }
 
   if (player.trait === 'Shield' && Math.random() < 0.3) {
     console.log(`Shield blocked damage for player ${player.username}`);
-    return; // 30% chance to completely block damage
+    return true; // 30% chance to completely block damage, but still counts as a hit
   }
   
   let actualDamage = damage;
@@ -230,7 +229,6 @@ function handleDamage(player, damage, ws) {
     console.log(`Player ${player.username} has died`);
     ws.send(JSON.stringify({ type: 'dead' }));
     players.delete(ws);
-    broadcastGameState();
   } else {
     ws.send(JSON.stringify({ 
       type: 'hit', 
@@ -241,6 +239,7 @@ function handleDamage(player, damage, ws) {
   }
   
   broadcastGameState(); // Ensure all clients are updated after damage
+  return true; // The bullet hit the player
 }
 
 function respawnPlayer(player, ws) {
