@@ -20,11 +20,24 @@ const BULLET_SPEED = 10;
 const MINIMAP_SIZE = 150;
 const LEVEL_UP_MESSAGE_DURATION = 180; // 3 seconds at 60 fps
 
-module.exports = {
-    SPEED,
-    MAP,
-    SHIP_TIERS,
-    BULLET_SPEED,
-    MINIMAP_SIZE,
-    LEVEL_UP_MESSAGE_DURATION
-};
+// Check if we're in a browser environment
+if (typeof window !== 'undefined') {
+    window.GAME_CONSTANTS = {
+        SPEED,
+        MAP,
+        SHIP_TIERS,
+        BULLET_SPEED,
+        MINIMAP_SIZE,
+        LEVEL_UP_MESSAGE_DURATION
+    };
+} else {
+    // We're in Node.js
+    module.exports = {
+        SPEED,
+        MAP,
+        SHIP_TIERS,
+        BULLET_SPEED,
+        MINIMAP_SIZE,
+        LEVEL_UP_MESSAGE_DURATION
+    };
+}
