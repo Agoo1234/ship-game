@@ -1,5 +1,32 @@
 // Import constants from the global GAME_CONSTANTS object
-const { SPEED, MAP, SHIP_TIERS, BULLET_SPEED, MINIMAP_SIZE, LEVEL_UP_MESSAGE_DURATION } = window.GAME_CONSTANTS;
+const { SPEED, MAP, SHIP_TIERS, BULLET_SPEED, MINIMAP_SIZE, LEVEL_UP_MESSAGE_DURATION } = window.GAME_CONSTANTS || {};
+
+// Fallback values in case GAME_CONSTANTS is not defined
+const FALLBACK_CONSTANTS = {
+    SPEED: 5,
+    MAP: { width: 4000, height: 3000 },
+    SHIP_TIERS: [
+        { name: 'Scout', color: '#fff', health: 100, trait: 'Fast Reload', expToNextLevel: 100 },
+        { name: 'Fighter', color: '#ff0', health: 150, trait: 'Double Shot', expToNextLevel: 250 },
+        { name: 'Destroyer', color: '#0ff', health: 200, trait: 'Shield', expToNextLevel: 500 },
+        { name: 'Battleship', color: '#f0f', health: 300, trait: 'Heavy Bullet', expToNextLevel: 1000 },
+        { name: 'Dreadnought', color: '#0f0', health: 500, trait: 'Rear Shot', expToNextLevel: 2000 },
+        { name: 'Titan', color: '#f00', health: 1000, trait: 'All Traits', expToNextLevel: Infinity }
+    ],
+    BULLET_SPEED: 10,
+    MINIMAP_SIZE: 150,
+    LEVEL_UP_MESSAGE_DURATION: 180
+};
+
+// Use the GAME_CONSTANTS if available, otherwise use the fallback values
+const {
+    SPEED = FALLBACK_CONSTANTS.SPEED,
+    MAP = FALLBACK_CONSTANTS.MAP,
+    SHIP_TIERS = FALLBACK_CONSTANTS.SHIP_TIERS,
+    BULLET_SPEED = FALLBACK_CONSTANTS.BULLET_SPEED,
+    MINIMAP_SIZE = FALLBACK_CONSTANTS.MINIMAP_SIZE,
+    LEVEL_UP_MESSAGE_DURATION = FALLBACK_CONSTANTS.LEVEL_UP_MESSAGE_DURATION
+} = window.GAME_CONSTANTS || {};
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
