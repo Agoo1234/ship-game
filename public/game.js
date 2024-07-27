@@ -83,9 +83,34 @@ function drawShip(player) {
     // Main body
     ctx.beginPath();
     ctx.moveTo(20, 0);
-    ctx.lineTo(-10, 10);
-    ctx.lineTo(-5, 0);
-    ctx.lineTo(-10, -10);
+    ctx.lineTo(-20, 8);
+    ctx.lineTo(-15, 0);
+    ctx.lineTo(-20, -8);
+    ctx.closePath();
+    ctx.fillStyle = shipTiers[player.tier].color;
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
+
+    // Wings
+    ctx.beginPath();
+    ctx.moveTo(0, 20);
+    ctx.lineTo(10, 0);
+    ctx.lineTo(0, -20);
+    ctx.lineTo(-5, -15);
+    ctx.lineTo(-5, 15);
+    ctx.closePath();
+    ctx.fillStyle = shipTiers[player.tier].color;
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
+
+    // Tail
+    ctx.beginPath();
+    ctx.moveTo(-15, 0);
+    ctx.lineTo(-20, 10);
+    ctx.lineTo(-25, 0);
+    ctx.lineTo(-20, -10);
     ctx.closePath();
     ctx.fillStyle = shipTiers[player.tier].color;
     ctx.fill();
@@ -94,19 +119,9 @@ function drawShip(player) {
 
     // Cockpit
     ctx.beginPath();
-    ctx.arc(5, 0, 5, 0, Math.PI * 2);
+    ctx.ellipse(5, 0, 7, 4, 0, 0, Math.PI * 2);
     ctx.fillStyle = 'lightblue';
     ctx.fill();
-    ctx.strokeStyle = 'white';
-    ctx.stroke();
-
-    // Wings
-    ctx.beginPath();
-    ctx.moveTo(0, 15);
-    ctx.lineTo(-5, 5);
-    ctx.lineTo(10, 0);
-    ctx.lineTo(-5, -5);
-    ctx.lineTo(0, -15);
     ctx.strokeStyle = 'white';
     ctx.stroke();
 
