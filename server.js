@@ -1,25 +1,11 @@
 const WebSocket = require('ws');
 const http = require('http');
 const express = require('express');
+const { MAP, SHIP_TIERS } = require('./public/constants.js');
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
-
-// Define map dimensions
-const MAP = {
-  width: 4000,
-  height: 3000
-};
-
-const shipTiers = [
-  { name: 'Scout', health: 100, damage: 10, expToNextLevel: 100, trait: 'fastReload' },
-  { name: 'Fighter', health: 150, damage: 15, expToNextLevel: 250, trait: 'doubleBullet' },
-  { name: 'Destroyer', health: 200, damage: 20, expToNextLevel: 500, trait: 'shield', shieldHealth: 100 },
-  { name: 'Battleship', health: 300, damage: 30, expToNextLevel: 1000, trait: 'heavyBullet' },
-  { name: 'Dreadnought', health: 500, damage: 40, expToNextLevel: 2000, trait: 'rearShot' },
-  { name: 'Titan', health: 1000, damage: 50, expToNextLevel: Infinity, trait: 'allTraits', shieldHealth: 200 }
-];
 
 const players = new Map();
 let nextPlayerId = 1;
@@ -28,11 +14,11 @@ let bullets = [];
 
 function generateStars() {
   stars = [];
-  const numStars = Math.floor((canvas.width * canvas.height) / 40000); // Adjust star density
+  const numStars = Math.floor((MAP.width * MAP.height) / 40000); // Adjust star density
   for (let i = 0; i < numStars; i++) {
     stars.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
+      x: Math.random() * MAP.width,
+      y: Math.random() * MAP.height,
       value: Math.floor(Math.random() * 20) + 10
     });
   }
@@ -53,10 +39,10 @@ wss.on('connection', (ws) => {
         angle: 0,
         tier: 0,
         exp: 0,
-        health: shipTiers[0].health,
-        damage: shipTiers[0].damage,
+        health: SHIP_TIERS[0].health,
+        damage: SHIP_TIERS[0].damage,
         lastShot: 0,
-        trait: shipTiers[0].trait,
+        trait: SHIP_TIERS[0].trait,
         shieldHealth: 0
       };
       players.set(ws, player);
@@ -90,14 +76,14 @@ function checkStarCollision(player) {
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance < 20) {
       player.exp += star.value;
-      if (player.exp >= shipTiers[player.tier].expToNextLevel && player.tier < shipTiers.length - 1) {
+      if (player.exp >= SHIP_TIERS[player.tier].expToNextLevel && player.tier < SHIP_TIERS.length - 1) {
         player.tier++;
-        player.health = shipTiers[player.tier].health;
-        player.damage = shipTiers[player.tier].damage;
-        player.trait = shipTiers[player.tier].trait;
-        console.log(`Player ${player.username} leveled up to tier ${player.tier} (${shipTiers[player.tier].name}), new trait: ${player.trait}`);
+        player.health = SHIP_TIERS[player.tier].health;
+        player.damage = SHIP_TIERS[player.tier].damage;
+        player.trait = SHIP_TIERS[player.tier].trait;
+        console.log(`Player ${player.username} leveled up to tier ${player.tier} (${SHIP_TIERS[player.tier].name}), new trait: ${player.trait}`);
         const ws = Array.from(players.entries()).find(([_, p]) => p.id === player.id)[0];
-        ws.send(JSON.stringify({ type: 'levelUp', newTier: player.tier, shipName: shipTiers[player.tier].name }));
+        ws.send(JSON.stringify({ type: 'levelUp', newTier: player.tier, shipName: SHIP_TIERS[player.tier].name }));
       }
       return false;
     }

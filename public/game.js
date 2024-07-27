@@ -1,3 +1,5 @@
+import { SPEED, MAP, SHIP_TIERS, BULLET_SPEED, MINIMAP_SIZE, LEVEL_UP_MESSAGE_DURATION } from './constants.js';
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -11,11 +13,6 @@ let camera = {
     height: window.innerHeight
 };
 
-let MAP = {
-    width: 4000,
-    height: 3000
-};
-
 const introScreen = document.getElementById('introScreen');
 const gameContainer = document.getElementById('gameContainer');
 const usernameInput = document.getElementById('usernameInput');
@@ -27,17 +24,6 @@ let stars = [];
 let localPlayer = null;
 let keys = {};
 let username = '';
-
-const shipTiers = [
-  { name: 'Scout', color: '#fff', health: 100, trait: 'Fast Reload' },
-  { name: 'Fighter', color: '#ff0', health: 150, trait: 'Double Shot' },
-  { name: 'Destroyer', color: '#0ff', health: 200, trait: 'Shield' },
-  { name: 'Battleship', color: '#f0f', health: 300, trait: 'Heavy Bullet' },
-  { name: 'Dreadnought', color: '#0f0', health: 500, trait: 'Rear Shot' },
-  { name: 'Titan', color: '#f00', health: 1000, trait: 'All Traits' }
-];
-
-const SPEED = 5;
 
 startButton.addEventListener('click', () => {
     username = usernameInput.value.trim();
@@ -94,7 +80,7 @@ function drawShip(player) {
     ctx.translate(player.x, player.y);
     ctx.rotate(player.angle);
     
-    const color = shipTiers[player.tier].color;
+    const color = SHIP_TIERS[player.tier].color;
     ctx.fillStyle = color;
     ctx.strokeStyle = 'white';
 
@@ -141,7 +127,7 @@ function drawShip(player) {
     ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, healthBarWidth, healthBarHeight);
     
     ctx.fillStyle = 'green';
-    const currentHealthWidth = (player.health / shipTiers[player.tier].health) * healthBarWidth;
+    const currentHealthWidth = (player.health / SHIP_TIERS[player.tier].health) * healthBarWidth;
     ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, currentHealthWidth, healthBarHeight);
     
     ctx.fillStyle = 'white';
@@ -276,25 +262,24 @@ function updateCamera() {
 }
 
 function drawMinimap() {
-    const minimapSize = 150;
-    const minimapScale = minimapSize / Math.max(MAP.width, MAP.height);
+    const minimapScale = MINIMAP_SIZE / Math.max(MAP.width, MAP.height);
     
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.fillRect(canvas.width - minimapSize - 10, canvas.height - minimapSize - 10, minimapSize, minimapSize);
+    ctx.fillRect(canvas.width - MINIMAP_SIZE - 10, canvas.height - MINIMAP_SIZE - 10, MINIMAP_SIZE, MINIMAP_SIZE);
     
     players.forEach(player => {
         ctx.fillStyle = player === localPlayer ? '#00ff00' : '#ff0000';
         ctx.fillRect(
-            canvas.width - minimapSize - 10 + player.x * minimapScale,
-            canvas.height - minimapSize - 10 + player.y * minimapScale,
+            canvas.width - MINIMAP_SIZE - 10 + player.x * minimapScale,
+            canvas.height - MINIMAP_SIZE - 10 + player.y * minimapScale,
             3, 3
         );
     });
 
     ctx.strokeStyle = '#ffffff';
     ctx.strokeRect(
-        canvas.width - minimapSize - 10 + camera.x * minimapScale,
-        canvas.height - minimapSize - 10 + camera.y * minimapScale,
+        canvas.width - MINIMAP_SIZE - 10 + camera.x * minimapScale,
+        canvas.height - MINIMAP_SIZE - 10 + camera.y * minimapScale,
         canvas.width * minimapScale,
         canvas.height * minimapScale
     );
@@ -305,7 +290,7 @@ let levelUpMessageTimer = 0;
 
 function showLevelUpMessage(newTier, shipName) {
     levelUpMessage = `Leveled up to ${shipName}!`;
-    levelUpMessageTimer = 180; // Show message for 3 seconds (60 fps * 3)
+    levelUpMessageTimer = LEVEL_UP_MESSAGE_DURATION;
 }
 
 function drawLevelUpMessage() {
@@ -330,7 +315,7 @@ function updateLevelUI() {
         const shieldInfo = document.getElementById('shieldInfo');
 
         levelInfo.textContent = `Level: ${localPlayer.tier + 1}`;
-        shipName.textContent = `Ship: ${shipTiers[localPlayer.tier].name} (${shipTiers[localPlayer.tier].trait})`;
+        shipName.textContent = `Ship: ${SHIP_TIERS[localPlayer.tier].name} (${SHIP_TIERS[localPlayer.tier].trait})`;
         healthInfo.textContent = `Health: ${Math.max(0, Math.round(localPlayer.health))}`;
         
         if (localPlayer.shieldHealth > 0) {
@@ -340,8 +325,8 @@ function updateLevelUI() {
             shieldInfo.style.display = 'none';
         }
 
-        const currentTier = shipTiers[localPlayer.tier];
-        const nextTier = shipTiers[localPlayer.tier + 1];
+        const currentTier = SHIP_TIERS[localPlayer.tier];
+        const nextTier = SHIP_TIERS[localPlayer.tier + 1];
         if (nextTier) {
             const progress = (localPlayer.exp - currentTier.expToNextLevel) / (nextTier.expToNextLevel - currentTier.expToNextLevel) * 100;
             expBar.style.width = `${progress}%`;
@@ -382,7 +367,6 @@ function handleMovement() {
 
 function shoot() {
     if (localPlayer) {
-        const bulletSpeed = 10;
         const bulletX = localPlayer.x + Math.cos(localPlayer.angle) * 20;
         const bulletY = localPlayer.y + Math.sin(localPlayer.angle) * 20;
         ws.send(JSON.stringify({
@@ -390,7 +374,7 @@ function shoot() {
             x: bulletX,
             y: bulletY,
             angle: localPlayer.angle,
-            speed: bulletSpeed
+            speed: BULLET_SPEED
         }));
     }
 }
