@@ -364,17 +364,17 @@ function updateLevelUI() {
 }
 
 function handleMovement() {
-    if (localPlayer) {
-        let dx = 0;
-        let dy = 0;
-        if (keys['w']) dy -= SPEED;
-        if (keys['s']) dy += SPEED;
-        if (keys['a']) dx -= SPEED;
-        if (keys['d']) dx += SPEED;
+    if (localPlayer && mousePosition) {
+        const dx = mousePosition.x - localPlayer.x;
+        const dy = mousePosition.y - localPlayer.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (dx !== 0 || dy !== 0) {
-            let newX = localPlayer.x + dx;
-            let newY = localPlayer.y + dy;
+        if (distance > 5) {  // Only move if the cursor is more than 5 pixels away
+            const moveX = (dx / distance) * SPEED;
+            const moveY = (dy / distance) * SPEED;
+
+            let newX = localPlayer.x + moveX;
+            let newY = localPlayer.y + moveY;
 
             // Prevent the ship from going past the edge of the map
             newX = Math.max(20, Math.min(newX, MAP.width - 20));
@@ -406,11 +406,14 @@ function shoot() {
     }
 }
 
+let mousePosition = null;
+
 canvas.addEventListener('mousemove', (event) => {
     if (localPlayer) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left + camera.x;
         const y = event.clientY - rect.top + camera.y;
+        mousePosition = { x, y };
         localPlayer.angle = Math.atan2(y - localPlayer.y, x - localPlayer.x);
 
         ws.send(JSON.stringify({
