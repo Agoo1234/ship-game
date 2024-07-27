@@ -167,7 +167,7 @@ function drawDestroyer() {
     ctx.lineTo(-20, -5);
     ctx.lineTo(10, -15);
     ctx.closePath();
-    ctx.fillStyle = shipTiers[2].color; // Destroyer color
+    ctx.fillStyle = SHIP_TIERS[2].color; // Destroyer color
     ctx.fill();
     ctx.stroke();
 }
