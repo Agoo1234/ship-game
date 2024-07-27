@@ -1,3 +1,6 @@
+// Import constants from the global GAME_CONSTANTS object
+const { SPEED, MAP, SHIP_TIERS, BULLET_SPEED, MINIMAP_SIZE, LEVEL_UP_MESSAGE_DURATION } = window.GAME_CONSTANTS;
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
