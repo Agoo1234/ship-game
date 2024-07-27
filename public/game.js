@@ -1,6 +1,5 @@
 // Import constants from the global GAME_CONSTANTS object or use fallback values
 const {
-    MAP = { width: 4000, height: 3000 },
     SHIP_TIERS = [
         { name: 'Scout', color: '#fff', health: 100, trait: 'Fast Reload', expToNextLevel: 100 },
         { name: 'Fighter', color: '#ff0', health: 150, trait: 'Triple Shot', expToNextLevel: 250 },
@@ -13,6 +12,9 @@ const {
     MINIMAP_SIZE = 150,
     LEVEL_UP_MESSAGE_DURATION = 180
 } = window.GAME_CONSTANTS || {};
+
+// Use the MAP constant from window.GAME_CONSTANTS or fallback to a default value
+const MAP = window.GAME_CONSTANTS?.MAP || { width: 4000, height: 3000 };
 
 const SPEED = 3; // Reduced speed from 5 to 3
 
