@@ -398,7 +398,7 @@ let bullets = [];
 function drawBullet(bullet) {
     ctx.fillStyle = 'white';
     ctx.beginPath();
-    ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
+    ctx.arc(bullet.x, bullet.y, bullet.size || 3, 0, Math.PI * 2);
     ctx.fill();
 }
 

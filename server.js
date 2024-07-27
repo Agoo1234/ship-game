@@ -106,7 +106,8 @@ function handleShooting(player, data) {
       angle: data.angle,
       speed: data.speed,
       damage: player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? player.damage * 1.5 : player.damage,
-      playerId: player.id
+      playerId: player.id,
+      size: player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? 6 : 3
     };
     bullets.push(bulletData);
 
@@ -127,8 +128,10 @@ function handleShooting(player, data) {
 
 function updateBullets() {
   bullets = bullets.filter(bullet => {
-    bullet.x += Math.cos(bullet.angle) * bullet.speed;
-    bullet.y += Math.sin(bullet.angle) * bullet.speed;
+    const dx = Math.cos(bullet.angle) * bullet.speed;
+    const dy = Math.sin(bullet.angle) * bullet.speed;
+    bullet.x += dx;
+    bullet.y += dy;
     
     if (bullet.x < 0 || bullet.x > MAP.width || bullet.y < 0 || bullet.y > MAP.height) {
       return false;
