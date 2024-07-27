@@ -102,18 +102,19 @@ function handleShooting(player, data) {
     player.lastShot = now;
     const baseDamage = player.damage || SHIP_TIERS[player.tier].damage;
     const bulletDamage = player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? baseDamage * 1.5 : baseDamage;
+    const finalDamage = Math.max(1, Math.round(bulletDamage)); // Ensure damage is at least 1 and rounded
     const bulletData = {
       x: data.x,
       y: data.y,
       angle: data.angle,
       speed: data.speed,
-      damage: Math.max(1, Math.round(bulletDamage)), // Ensure damage is at least 1 and rounded
+      damage: finalDamage,
       playerId: player.id,
       size: player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? 6 : 3
     };
     bullets.push(bulletData);
 
-    console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet with damage: ${bulletData.damage}`);
+    console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet with damage: ${finalDamage}`);
 
     if (player.trait === 'Double Shot' || player.trait === 'All Traits') {
       console.log(`Double Shot trait activated for player ${player.username}`);
