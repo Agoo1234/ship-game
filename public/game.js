@@ -98,64 +98,66 @@ function connectWebSocket() {
 }
 
 function drawShip(player) {
-    ctx.save();
-    ctx.translate(player.x, player.y);
-    ctx.rotate(player.angle);
-    
-    const color = SHIP_TIERS[player.tier].color;
-    ctx.fillStyle = color;
-    ctx.strokeStyle = 'white';
+    if (isOnScreen(player)) {
+        ctx.save();
+        ctx.translate(player.x, player.y);
+        ctx.rotate(player.angle);
+        
+        const color = SHIP_TIERS[player.tier].color;
+        ctx.fillStyle = color;
+        ctx.strokeStyle = 'white';
 
-    // Draw the shield if it's active
-    if (player.shieldHealth > 0) {
-        ctx.globalAlpha = 0.3;
-        ctx.beginPath();
-        ctx.arc(0, 0, 35, 0, Math.PI * 2);
-        ctx.fillStyle = '#00FFFF';
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
+        // Draw the shield if it's active
+        if (player.shieldHealth > 0) {
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.arc(0, 0, 35, 0, Math.PI * 2);
+            ctx.fillStyle = '#00FFFF';
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        }
+
+        // Draw ship based on tier
+        switch(player.tier) {
+            case 0: // Scout
+                drawScout();
+                break;
+            case 1: // Fighter
+                drawFighter();
+                break;
+            case 2: // Destroyer
+                drawDestroyer();
+                break;
+            case 3: // Battleship
+                drawBattleship();
+                break;
+            case 4: // Dreadnought
+                drawDreadnought();
+                break;
+            case 5: // Titan
+                drawTitan();
+                break;
+        }
+
+        ctx.restore();
+
+        // Draw health bar
+        const healthBarWidth = 50;
+        const healthBarHeight = 5;
+        const healthBarY = player.y - 30;
+        
+        ctx.fillStyle = 'red';
+        ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, healthBarWidth, healthBarHeight);
+        
+        ctx.fillStyle = 'green';
+        const currentHealthWidth = (player.health / SHIP_TIERS[player.tier].health) * healthBarWidth;
+        ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, currentHealthWidth, healthBarHeight);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(player.username, player.x, healthBarY - 5);
     }
-
-    // Draw ship based on tier
-    switch(player.tier) {
-        case 0: // Scout
-            drawScout();
-            break;
-        case 1: // Fighter
-            drawFighter();
-            break;
-        case 2: // Destroyer
-            drawDestroyer();
-            break;
-        case 3: // Battleship
-            drawBattleship();
-            break;
-        case 4: // Dreadnought
-            drawDreadnought();
-            break;
-        case 5: // Titan
-            drawTitan();
-            break;
-    }
-
-    ctx.restore();
-
-    // Draw health bar
-    const healthBarWidth = 50;
-    const healthBarHeight = 5;
-    const healthBarY = player.y - 30;
-    
-    ctx.fillStyle = 'red';
-    ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, healthBarWidth, healthBarHeight);
-    
-    ctx.fillStyle = 'green';
-    const currentHealthWidth = (player.health / SHIP_TIERS[player.tier].health) * healthBarWidth;
-    ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, currentHealthWidth, healthBarHeight);
-    
-    ctx.fillStyle = 'white';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(player.username, player.x, healthBarY - 5);
 }
 
 function drawScout() {
@@ -245,8 +247,9 @@ function drawStar(star) {
 }
 
 function isOnScreen(object) {
-    return object.x >= camera.x - 20 && object.x <= camera.x + camera.width + 20 &&
-           object.y >= camera.y - 20 && object.y <= camera.y + camera.height + 20;
+    const margin = 50; // Increased margin to account for player size
+    return object.x >= camera.x - margin && object.x <= camera.x + camera.width + margin &&
+           object.y >= camera.y - margin && object.y <= camera.y + camera.height + margin;
 }
 
 function gameLoop() {
