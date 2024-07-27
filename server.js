@@ -97,7 +97,7 @@ function checkStarCollision(player) {
 
 function handleShooting(player, data) {
   const now = Date.now();
-  const cooldown = player.trait === 'fastReload' || player.trait === 'allTraits' ? 250 : 500; // 250ms cooldown for fastReload trait
+  const cooldown = player.trait === 'Fast Reload' || player.trait === 'All Traits' ? 250 : 500; // 250ms cooldown for Fast Reload trait
   if (now - player.lastShot > cooldown) {
     player.lastShot = now;
     const bulletData = {
@@ -105,21 +105,21 @@ function handleShooting(player, data) {
       y: data.y,
       angle: data.angle,
       speed: data.speed,
-      damage: player.trait === 'heavyBullet' || player.trait === 'allTraits' ? player.damage * 1.5 : player.damage,
+      damage: player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? player.damage * 1.5 : player.damage,
       playerId: player.id
     };
     bullets.push(bulletData);
 
     console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet`);
 
-    if (player.trait === 'doubleBullet' || player.trait === 'allTraits') {
-      console.log(`Double bullet trait activated for player ${player.username}`);
+    if (player.trait === 'Double Shot' || player.trait === 'All Traits') {
+      console.log(`Double Shot trait activated for player ${player.username}`);
       bullets.push({...bulletData, angle: bulletData.angle + Math.PI / 12});
       bullets.push({...bulletData, angle: bulletData.angle - Math.PI / 12});
     }
 
-    if (player.trait === 'rearShot' || player.trait === 'allTraits') {
-      console.log(`Rear shot trait activated for player ${player.username}`);
+    if (player.trait === 'Rear Shot' || player.trait === 'All Traits') {
+      console.log(`Rear Shot trait activated for player ${player.username}`);
       bullets.push({...bulletData, angle: bulletData.angle + Math.PI});
     }
   }
@@ -199,6 +199,11 @@ function checkBulletCollisions(bullet) {
 }
 
 function handleDamage(player, damage) {
+  if (player.trait === 'Shield' && Math.random() < 0.3) {
+    console.log(`Shield blocked damage for player ${player.username}`);
+    return; // 30% chance to completely block damage
+  }
+  
   if (player.shieldHealth > 0) {
     player.shieldHealth = Math.max(0, player.shieldHealth - damage);
     if (player.shieldHealth === 0) {
