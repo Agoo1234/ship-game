@@ -57,8 +57,8 @@ function startGame() {
 }
 
 function connectWebSocket() {
-    ws = new WebSocket(window.location.protocol === 'file:' ? 'ws://localhost:3000' : `ws://${window.location.host}`);
-
+    // ws = new WebSocket(window.location.protocol === 'file:' ? 'ws://localhost:3000' : `ws://192.168.86.234:3000`);
+    ws = new WebSocket("192.168.86.234:3000");
     ws.onopen = () => {
         ws.send(JSON.stringify({ type: 'join', username: username }));
     };
