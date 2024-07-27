@@ -12,6 +12,7 @@ let nextPlayerId = 1;
 let stars = [];
 let bullets = [];
 const SHIELD_REGENERATION_DELAY = 10000; // 10 seconds in milliseconds
+const DISCONNECT_TIMEOUT = 5000; // 5 seconds in milliseconds
 
 function generateStars() {
   stars = [];
@@ -45,7 +46,8 @@ wss.on('connection', (ws) => {
         lastShot: 0,
         trait: SHIP_TIERS[0].trait,
         shieldHealth: 0,
-        lastHitTime: Date.now()
+        lastHitTime: Date.now(),
+        lastActiveTime: Date.now()
       };
       players.set(ws, player);
       broadcastGameState();
@@ -53,12 +55,15 @@ wss.on('connection', (ws) => {
       const player = players.get(ws);
       player.x = data.x;
       player.y = data.y;
+      player.lastActiveTime = Date.now();
       checkStarCollision(player);
     } else if (data.type === 'rotate') {
       const player = players.get(ws);
       player.angle = data.angle;
+      player.lastActiveTime = Date.now();
     } else if (data.type === 'shoot') {
       const player = players.get(ws);
+      player.lastActiveTime = Date.now();
       handleShooting(player, data);
     }
     updateBullets();
@@ -320,8 +325,19 @@ function regenerateShields() {
 setInterval(() => {
   updateBullets();
   regenerateShields();
+  checkDisconnectedPlayers();
   broadcastGameState();
 }, 1000 / 60); // 60 FPS
+
+function checkDisconnectedPlayers() {
+  const now = Date.now();
+  players.forEach((player, ws) => {
+    if (now - player.lastActiveTime > DISCONNECT_TIMEOUT) {
+      ws.send(JSON.stringify({ type: 'disconnected' }));
+      players.delete(ws);
+    }
+  });
+}
 
 app.use(express.static(__dirname + '/public'));
 
