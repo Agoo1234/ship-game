@@ -70,6 +70,7 @@ function gameLoop() {
 
     stars.forEach(star => drawStar(star));
     players.forEach(player => drawShip(player));
+    bullets.forEach(bullet => drawBullet(bullet));
 
     requestAnimationFrame(gameLoop);
 }
@@ -120,8 +121,15 @@ function handleMovement() {
 
 function shoot() {
     if (localPlayer) {
+        const bulletSpeed = 10;
+        const bulletX = localPlayer.x + Math.cos(localPlayer.angle) * 20;
+        const bulletY = localPlayer.y + Math.sin(localPlayer.angle) * 20;
         ws.send(JSON.stringify({
-            type: 'shoot'
+            type: 'shoot',
+            x: bulletX,
+            y: bulletY,
+            angle: localPlayer.angle,
+            speed: bulletSpeed
         }));
     }
 }
@@ -141,6 +149,15 @@ canvas.addEventListener('mousemove', (event) => {
 });
 
 canvas.addEventListener('click', shoot);
+
+let bullets = [];
+
+function drawBullet(bullet) {
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
+    ctx.fill();
+}
 
 window.addEventListener('keydown', (e) => {
     keys[e.key.toLowerCase()] = true;
