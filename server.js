@@ -129,8 +129,8 @@ function handleShooting(player, data) {
 
     console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet with damage: ${validDamage}`);
 
-    if (player.trait === 'Double Shot' || player.trait === 'All Traits') {
-      console.log(`Double Shot trait activated for player ${player.username}`);
+    if (player.trait === 'Triple Shot' || player.trait === 'All Traits') {
+      console.log(`Triple Shot trait activated for player ${player.username}`);
       bullets.push({...bulletData, angle: bulletData.angle + Math.PI / 12});
       bullets.push({...bulletData, angle: bulletData.angle - Math.PI / 12});
     }
