@@ -8,6 +8,7 @@ const ws = new WebSocket(window.location.protocol === 'file:' ? 'ws://localhost:
 
 let players = [];
 let localPlayer = null;
+let keys = {};
 
 const shipTiers = [
   { name: 'Scout', color: '#fff' },
@@ -15,6 +16,8 @@ const shipTiers = [
   { name: 'Destroyer', color: '#0ff' },
   { name: 'Battleship', color: '#f0f' }
 ];
+
+const SPEED = 5;
 
 ws.onmessage = (event) => {
     players = JSON.parse(event.data);
@@ -69,18 +72,38 @@ function updateLevelUI() {
     }
 }
 
+function handleMovement() {
+    if (localPlayer) {
+        let dx = 0;
+        let dy = 0;
+        if (keys['w']) dy -= SPEED;
+        if (keys['s']) dy += SPEED;
+        if (keys['a']) dx -= SPEED;
+        if (keys['d']) dx += SPEED;
+
+        if (dx !== 0 || dy !== 0) {
+            localPlayer.x += dx;
+            localPlayer.y += dy;
+            ws.send(JSON.stringify({
+                type: 'move',
+                x: localPlayer.x,
+                y: localPlayer.y,
+                angle: localPlayer.angle
+            }));
+        }
+    }
+}
+
 canvas.addEventListener('mousemove', (event) => {
     if (localPlayer) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        const angle = Math.atan2(y - localPlayer.y, x - localPlayer.x);
+        localPlayer.angle = Math.atan2(y - localPlayer.y, x - localPlayer.x);
 
         ws.send(JSON.stringify({
-            type: 'move',
-            x: x,
-            y: y,
-            angle: angle
+            type: 'rotate',
+            angle: localPlayer.angle
         }));
     }
 });
@@ -92,5 +115,25 @@ canvas.addEventListener('click', () => {
         }));
     }
 });
+
+window.addEventListener('keydown', (e) => {
+    keys[e.key.toLowerCase()] = true;
+});
+
+window.addEventListener('keyup', (e) => {
+    keys[e.key.toLowerCase()] = false;
+});
+
+function gameLoop() {
+    handleMovement();
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    players.forEach(player => {
+        drawShip(player);
+    });
+
+    requestAnimationFrame(gameLoop);
+}
 
 gameLoop();

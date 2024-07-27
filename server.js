@@ -35,6 +35,7 @@ wss.on('connection', (ws) => {
     if (data.type === 'move') {
       player.x = data.x;
       player.y = data.y;
+    } else if (data.type === 'rotate') {
       player.angle = data.angle;
     } else if (data.type === 'shoot') {
       handleShooting(player);
