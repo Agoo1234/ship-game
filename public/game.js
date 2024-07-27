@@ -17,10 +17,12 @@ let keys = {};
 let username = '';
 
 const shipTiers = [
-  { name: 'Scout', color: '#fff', health: 100 },
-  { name: 'Fighter', color: '#ff0', health: 150 },
-  { name: 'Destroyer', color: '#0ff', health: 200 },
-  { name: 'Battleship', color: '#f0f', health: 300 }
+  { name: 'Scout', color: '#fff', health: 100, trait: 'Fast Reload' },
+  { name: 'Fighter', color: '#ff0', health: 150, trait: 'Double Shot' },
+  { name: 'Destroyer', color: '#0ff', health: 200, trait: 'Shield' },
+  { name: 'Battleship', color: '#f0f', health: 300, trait: 'Heavy Bullet' },
+  { name: 'Dreadnought', color: '#0f0', health: 500, trait: 'Rear Shot' },
+  { name: 'Titan', color: '#f00', health: 1000, trait: 'All Traits' }
 ];
 
 const SPEED = 5;
@@ -80,50 +82,31 @@ function drawShip(player) {
     ctx.translate(player.x, player.y);
     ctx.rotate(player.angle);
     
-    // Main body
-    ctx.beginPath();
-    ctx.moveTo(20, 0);
-    ctx.lineTo(-20, 8);
-    ctx.lineTo(-15, 0);
-    ctx.lineTo(-20, -8);
-    ctx.closePath();
-    ctx.fillStyle = shipTiers[player.tier].color;
-    ctx.fill();
+    const color = shipTiers[player.tier].color;
+    ctx.fillStyle = color;
     ctx.strokeStyle = 'white';
-    ctx.stroke();
 
-    // Wings
-    ctx.beginPath();
-    ctx.moveTo(0, 20);
-    ctx.lineTo(10, 0);
-    ctx.lineTo(0, -20);
-    ctx.lineTo(-5, -15);
-    ctx.lineTo(-5, 15);
-    ctx.closePath();
-    ctx.fillStyle = shipTiers[player.tier].color;
-    ctx.fill();
-    ctx.strokeStyle = 'white';
-    ctx.stroke();
-
-    // Tail
-    ctx.beginPath();
-    ctx.moveTo(-15, 0);
-    ctx.lineTo(-20, 10);
-    ctx.lineTo(-25, 0);
-    ctx.lineTo(-20, -10);
-    ctx.closePath();
-    ctx.fillStyle = shipTiers[player.tier].color;
-    ctx.fill();
-    ctx.strokeStyle = 'white';
-    ctx.stroke();
-
-    // Cockpit
-    ctx.beginPath();
-    ctx.ellipse(5, 0, 7, 4, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'lightblue';
-    ctx.fill();
-    ctx.strokeStyle = 'white';
-    ctx.stroke();
+    // Draw ship based on tier
+    switch(player.tier) {
+        case 0: // Scout
+            drawScout();
+            break;
+        case 1: // Fighter
+            drawFighter();
+            break;
+        case 2: // Destroyer
+            drawDestroyer();
+            break;
+        case 3: // Battleship
+            drawBattleship();
+            break;
+        case 4: // Dreadnought
+            drawDreadnought();
+            break;
+        case 5: // Titan
+            drawTitan();
+            break;
+    }
 
     ctx.restore();
 
@@ -132,20 +115,92 @@ function drawShip(player) {
     const healthBarHeight = 5;
     const healthBarY = player.y - 30;
     
-    // Draw red background (total health)
     ctx.fillStyle = 'red';
     ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, healthBarWidth, healthBarHeight);
     
-    // Draw green foreground (current health)
     ctx.fillStyle = 'green';
     const currentHealthWidth = (player.health / shipTiers[player.tier].health) * healthBarWidth;
     ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, currentHealthWidth, healthBarHeight);
     
-    // Draw player username above health bar
     ctx.fillStyle = 'white';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
     ctx.fillText(player.username, player.x, healthBarY - 5);
+}
+
+function drawScout() {
+    ctx.beginPath();
+    ctx.moveTo(15, 0);
+    ctx.lineTo(-10, 10);
+    ctx.lineTo(-5, 0);
+    ctx.lineTo(-10, -10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+}
+
+function drawFighter() {
+    ctx.beginPath();
+    ctx.moveTo(20, 0);
+    ctx.lineTo(0, 15);
+    ctx.lineTo(-15, 5);
+    ctx.lineTo(-15, -5);
+    ctx.lineTo(0, -15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+}
+
+function drawDestroyer() {
+    ctx.beginPath();
+    ctx.moveTo(25, 0);
+    ctx.lineTo(10, 15);
+    ctx.lineTo(-20, 5);
+    ctx.lineTo(-15, 0);
+    ctx.lineTo(-20, -5);
+    ctx.lineTo(10, -15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+}
+
+function drawBattleship() {
+    ctx.beginPath();
+    ctx.moveTo(30, 0);
+    ctx.lineTo(15, 20);
+    ctx.lineTo(-25, 10);
+    ctx.lineTo(-20, 0);
+    ctx.lineTo(-25, -10);
+    ctx.lineTo(15, -20);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+}
+
+function drawDreadnought() {
+    ctx.beginPath();
+    ctx.moveTo(35, 0);
+    ctx.lineTo(20, 25);
+    ctx.lineTo(-30, 15);
+    ctx.lineTo(-25, 0);
+    ctx.lineTo(-30, -15);
+    ctx.lineTo(20, -25);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+}
+
+function drawTitan() {
+    ctx.beginPath();
+    ctx.moveTo(40, 0);
+    ctx.lineTo(25, 30);
+    ctx.lineTo(-35, 20);
+    ctx.lineTo(-30, 0);
+    ctx.lineTo(-35, -20);
+    ctx.lineTo(25, -30);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
 }
 
 function drawStar(star) {
@@ -200,7 +255,7 @@ function updateLevelUI() {
         const healthInfo = document.getElementById('healthInfo');
 
         levelInfo.textContent = `Level: ${localPlayer.tier + 1}`;
-        shipName.textContent = `Ship: ${shipTiers[localPlayer.tier].name}`;
+        shipName.textContent = `Ship: ${shipTiers[localPlayer.tier].name} (${shipTiers[localPlayer.tier].trait})`;
         healthInfo.textContent = `Health: ${Math.max(0, Math.round(localPlayer.health))}`;
 
         const currentTier = shipTiers[localPlayer.tier];

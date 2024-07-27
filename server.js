@@ -7,10 +7,12 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const shipTiers = [
-  { name: 'Scout', health: 100, damage: 10, expToNextLevel: 100 },
-  { name: 'Fighter', health: 150, damage: 15, expToNextLevel: 250 },
-  { name: 'Destroyer', health: 200, damage: 20, expToNextLevel: 500 },
-  { name: 'Battleship', health: 300, damage: 30, expToNextLevel: Infinity }
+  { name: 'Scout', health: 100, damage: 10, expToNextLevel: 100, trait: 'fastReload' },
+  { name: 'Fighter', health: 150, damage: 15, expToNextLevel: 250, trait: 'doubleBullet' },
+  { name: 'Destroyer', health: 200, damage: 20, expToNextLevel: 500, trait: 'shield' },
+  { name: 'Battleship', health: 300, damage: 30, expToNextLevel: 1000, trait: 'heavyBullet' },
+  { name: 'Dreadnought', health: 500, damage: 40, expToNextLevel: 2000, trait: 'rearShot' },
+  { name: 'Titan', health: 1000, damage: 50, expToNextLevel: Infinity, trait: 'allTraits' }
 ];
 
 const players = new Map();
@@ -46,7 +48,8 @@ wss.on('connection', (ws) => {
         exp: 0,
         health: shipTiers[0].health,
         damage: shipTiers[0].damage,
-        lastShot: 0
+        lastShot: 0,
+        trait: shipTiers[0].trait
       };
       players.set(ws, player);
       broadcastGameState();
@@ -98,17 +101,27 @@ function checkStarCollision(player) {
 
 function handleShooting(player, data) {
   const now = Date.now();
-  if (now - player.lastShot > 500) { // 500ms cooldown
+  const cooldown = player.trait === 'fastReload' ? 250 : 500; // 250ms cooldown for fastReload trait
+  if (now - player.lastShot > cooldown) {
     player.lastShot = now;
-    const bullet = {
+    const bulletData = {
       x: data.x,
       y: data.y,
       angle: data.angle,
       speed: data.speed,
-      damage: player.damage,
+      damage: player.trait === 'heavyBullet' ? player.damage * 1.5 : player.damage,
       playerId: player.id
     };
-    bullets.push(bullet);
+    bullets.push(bulletData);
+
+    if (player.trait === 'doubleBullet' || player.trait === 'allTraits') {
+      bullets.push({...bulletData, angle: bulletData.angle + Math.PI / 12});
+      bullets.push({...bulletData, angle: bulletData.angle - Math.PI / 12});
+    }
+
+    if (player.trait === 'rearShot' || player.trait === 'allTraits') {
+      bullets.push({...bulletData, angle: bulletData.angle + Math.PI});
+    }
   }
 }
 
@@ -128,14 +141,28 @@ function updateBullets() {
         const dy = player.y - bullet.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < 20) {
-          player.health -= bullet.damage;
-          if (player.health <= 0) {
-            ws.send(JSON.stringify({ type: 'dead' }));
-            players.delete(ws);
-          } else {
-            ws.send(JSON.stringify({ type: 'hit', health: player.health }));
+          if (player.trait !== 'shield' || Math.random() > 0.3) { // 30% chance to block for shield trait
+            player.health -= bullet.damage;
+            if (player.health <= 0) {
+              const shooter = Array.from(players.values()).find(p => p.id === bullet.playerId);
+              if (shooter) {
+                shooter.exp += 50; // Give XP for killing a player
+                if (shooter.exp >= shipTiers[shooter.tier].expToNextLevel && shooter.tier < shipTiers.length - 1) {
+                  shooter.tier++;
+                  shooter.health = shipTiers[shooter.tier].health;
+                  shooter.damage = shipTiers[shooter.tier].damage;
+                  shooter.trait = shipTiers[shooter.tier].trait;
+                  const shooterWs = Array.from(players.entries()).find(([_, p]) => p.id === shooter.id)[0];
+                  shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: shipTiers[shooter.tier].name }));
+                }
+              }
+              ws.send(JSON.stringify({ type: 'dead' }));
+              players.delete(ws);
+            } else {
+              ws.send(JSON.stringify({ type: 'hit', health: player.health }));
+            }
+            hit = true;
           }
-          hit = true;
         }
       }
     });
