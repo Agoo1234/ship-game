@@ -100,8 +100,10 @@ function handleShooting(player, data) {
   const cooldown = player.trait === 'Fast Reload' || player.trait === 'All Traits' ? 250 : 500; // 250ms cooldown for Fast Reload trait
   if (now - player.lastShot > cooldown) {
     player.lastShot = now;
-    const baseDamage = player.damage || SHIP_TIERS[player.tier].damage;
-    const bulletDamage = player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? baseDamage * 1.5 : baseDamage;
+    const baseDamage = SHIP_TIERS[player.tier].damage || 10; // Default to 10 if not defined
+    const tierMultiplier = 1 + (player.tier * 0.2); // 20% increase per tier
+    const traitMultiplier = player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? 1.5 : 1;
+    const bulletDamage = baseDamage * tierMultiplier * traitMultiplier;
     const finalDamage = Math.max(1, Math.round(bulletDamage)); // Ensure damage is at least 1 and rounded
     
     // Ensure finalDamage is a valid number
