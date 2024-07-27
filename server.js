@@ -86,6 +86,8 @@ function checkStarCollision(player) {
         player.tier++;
         player.health = shipTiers[player.tier].health;
         player.damage = shipTiers[player.tier].damage;
+        player.trait = shipTiers[player.tier].trait;
+        console.log(`Player ${player.username} leveled up to tier ${player.tier} (${shipTiers[player.tier].name}), new trait: ${player.trait}`);
         const ws = Array.from(players.entries()).find(([_, p]) => p.id === player.id)[0];
         ws.send(JSON.stringify({ type: 'levelUp', newTier: player.tier, shipName: shipTiers[player.tier].name }));
       }
@@ -101,7 +103,7 @@ function checkStarCollision(player) {
 
 function handleShooting(player, data) {
   const now = Date.now();
-  const cooldown = player.trait === 'fastReload' ? 250 : 500; // 250ms cooldown for fastReload trait
+  const cooldown = player.trait === 'fastReload' || player.trait === 'allTraits' ? 250 : 500; // 250ms cooldown for fastReload trait
   if (now - player.lastShot > cooldown) {
     player.lastShot = now;
     const bulletData = {
@@ -109,19 +111,21 @@ function handleShooting(player, data) {
       y: data.y,
       angle: data.angle,
       speed: data.speed,
-      damage: player.trait === 'heavyBullet' ? player.damage * 1.5 : player.damage,
+      damage: player.trait === 'heavyBullet' || player.trait === 'allTraits' ? player.damage * 1.5 : player.damage,
       playerId: player.id
     };
     bullets.push(bulletData);
 
+    console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet`);
+
     if (player.trait === 'doubleBullet' || player.trait === 'allTraits') {
+      console.log(`Double bullet trait activated for player ${player.username}`);
       bullets.push({...bulletData, angle: bulletData.angle + Math.PI / 12});
-      setTimeout(() => {
-        bullets.push({...bulletData, angle: bulletData.angle - Math.PI / 12});
-      }, 100); // 100ms delay for the second bullet
+      bullets.push({...bulletData, angle: bulletData.angle - Math.PI / 12});
     }
 
     if (player.trait === 'rearShot' || player.trait === 'allTraits') {
+      console.log(`Rear shot trait activated for player ${player.username}`);
       bullets.push({...bulletData, angle: bulletData.angle + Math.PI});
     }
   }
