@@ -127,6 +127,8 @@ function updateBullets() {
           if (player.health <= 0) {
             ws.send(JSON.stringify({ type: 'dead' }));
             players.delete(ws);
+          } else {
+            ws.send(JSON.stringify({ type: 'hit', health: player.health }));
           }
           hit = true;
         }

@@ -34,6 +34,11 @@ ws.onmessage = (event) => {
             localPlayer = players.find(p => p.id === localPlayer.id);
         }
         updateLevelUI();
+    } else if (data.type === 'hit') {
+        if (localPlayer) {
+            localPlayer.health = data.health;
+            updateLevelUI();
+        }
     }
 };
 
