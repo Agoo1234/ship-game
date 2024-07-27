@@ -242,6 +242,18 @@ function gameLoop() {
     ctx.save();
     ctx.translate(-camera.x, -camera.y);
 
+    stars.forEach(star => drawStar(star));
+    players.forEach(player => drawShip(player));
+    if (bullets && bullets.length > 0) {
+        bullets.forEach(bullet => drawBullet(bullet));
+    }
+
+    ctx.restore();
+
+    drawLevelUpMessage();
+    drawMinimap();
+
+    requestAnimationFrame(gameLoop);
 }
 
 function showDisconnectScreen() {
