@@ -17,7 +17,6 @@ const players = new Map();
 let nextPlayerId = 1;
 let stars = [];
 let bullets = [];
-let bullets = [];
 
 function generateStars() {
   stars = [];
