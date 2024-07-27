@@ -6,6 +6,12 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// Define canvas dimensions
+const canvas = {
+  width: 1920,  // Adjust this value as needed
+  height: 1080  // Adjust this value as needed
+};
+
 const shipTiers = [
   { name: 'Scout', health: 100, damage: 10, expToNextLevel: 100, trait: 'fastReload' },
   { name: 'Fighter', health: 150, damage: 15, expToNextLevel: 250, trait: 'doubleBullet' },
@@ -42,8 +48,8 @@ wss.on('connection', (ws) => {
       const player = {
         id: playerId,
         username: data.username,
-        x: Math.random() * 800,
-        y: Math.random() * 600,
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
         angle: 0,
         tier: 0,
         exp: 0,
