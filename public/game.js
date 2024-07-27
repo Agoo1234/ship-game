@@ -79,13 +79,37 @@ function drawShip(player) {
     ctx.save();
     ctx.translate(player.x, player.y);
     ctx.rotate(player.angle);
+    
+    // Main body
     ctx.beginPath();
     ctx.moveTo(20, 0);
     ctx.lineTo(-10, 10);
+    ctx.lineTo(-5, 0);
     ctx.lineTo(-10, -10);
     ctx.closePath();
-    ctx.strokeStyle = shipTiers[player.tier].color;
+    ctx.fillStyle = shipTiers[player.tier].color;
+    ctx.fill();
+    ctx.strokeStyle = 'white';
     ctx.stroke();
+
+    // Cockpit
+    ctx.beginPath();
+    ctx.arc(5, 0, 5, 0, Math.PI * 2);
+    ctx.fillStyle = 'lightblue';
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
+
+    // Wings
+    ctx.beginPath();
+    ctx.moveTo(0, 15);
+    ctx.lineTo(-5, 5);
+    ctx.lineTo(10, 0);
+    ctx.lineTo(-5, -5);
+    ctx.lineTo(0, -15);
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
+
     ctx.restore();
 
     // Draw health bar
