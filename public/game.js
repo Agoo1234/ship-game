@@ -19,6 +19,7 @@ const startButton = document.getElementById('startButton');
 let ws;
 let players = [];
 let stars = [];
+let bullets = [];
 let localPlayer = null;
 let keys = {};
 let username = '';
