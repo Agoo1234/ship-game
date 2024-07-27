@@ -56,10 +56,24 @@ function drawShip(player) {
     ctx.restore();
 
     // Draw health bar
+    const healthBarWidth = 50;
+    const healthBarHeight = 5;
+    const healthBarY = player.y - 30;
+    
+    // Draw red background (total health)
     ctx.fillStyle = 'red';
-    ctx.fillRect(player.x - 25, player.y - 30, 50, 5);
+    ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, healthBarWidth, healthBarHeight);
+    
+    // Draw green foreground (current health)
     ctx.fillStyle = 'green';
-    ctx.fillRect(player.x - 25, player.y - 30, (player.health / shipTiers[player.tier].health) * 50, 5);
+    const currentHealthWidth = (player.health / shipTiers[player.tier].health) * healthBarWidth;
+    ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, currentHealthWidth, healthBarHeight);
+    
+    // Draw player name or ID above health bar
+    ctx.fillStyle = 'white';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(player.id, player.x, healthBarY - 5);
 }
 
 function drawStar(star) {
