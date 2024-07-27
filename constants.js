@@ -1,6 +1,6 @@
 // Game constants
 const GAME_CONSTANTS = {
-    SPEED: 5,
+    SPEED: 1,
     MAP: {
         width: 4000,
         height: 3000
@@ -13,9 +13,9 @@ const GAME_CONSTANTS = {
         { name: 'Dreadnought', color: '#0f0', health: 500, trait: 'Rear Shot', expToNextLevel: 2000 },
         { name: 'Titan', color: '#f00', health: 1000, trait: 'All Traits', expToNextLevel: Infinity }
     ],
-    BULLET_SPEED: 10,
+    BULLET_SPEED: 6,
     MINIMAP_SIZE: 150,
-    LEVEL_UP_MESSAGE_DURATION: 180 // 3 seconds at 60 fps
+    LEVEL_UP_MESSAGE_DURATION: 360 // 3 seconds at 60 fps
 };
 
 // Make GAME_CONSTANTS available globally

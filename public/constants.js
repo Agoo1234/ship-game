@@ -1,5 +1,5 @@
 // Game constants
-const SPEED = 5;
+const SPEED = 3;
 const MAP = {
     width: 4000,
     height: 3000
@@ -16,7 +16,7 @@ const SHIP_TIERS = [
 ];
 
 // Other constants
-const BULLET_SPEED = 10;
+const BULLET_SPEED = 6;
 const MINIMAP_SIZE = 150;
 const LEVEL_UP_MESSAGE_DURATION = 180; // 3 seconds at 60 fps
 
