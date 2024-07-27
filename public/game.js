@@ -369,26 +369,25 @@ function handleMovement() {
         const dy = mousePosition.y - localPlayer.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance > 5) {  // Only move if the cursor is more than 5 pixels away
-            const moveX = (dx / distance) * SPEED;
-            const moveY = (dy / distance) * SPEED;
+        // Always move towards the last known mouse position
+        const moveX = (dx / Math.max(distance, 1)) * SPEED;
+        const moveY = (dy / Math.max(distance, 1)) * SPEED;
 
-            let newX = localPlayer.x + moveX;
-            let newY = localPlayer.y + moveY;
+        let newX = localPlayer.x + moveX;
+        let newY = localPlayer.y + moveY;
 
-            // Prevent the ship from going past the edge of the map
-            newX = Math.max(20, Math.min(newX, MAP.width - 20));
-            newY = Math.max(20, Math.min(newY, MAP.height - 20));
+        // Prevent the ship from going past the edge of the map
+        newX = Math.max(20, Math.min(newX, MAP.width - 20));
+        newY = Math.max(20, Math.min(newY, MAP.height - 20));
 
-            localPlayer.x = newX;
-            localPlayer.y = newY;
-            ws.send(JSON.stringify({
-                type: 'move',
-                x: localPlayer.x,
-                y: localPlayer.y,
-                angle: localPlayer.angle
-            }));
-        }
+        localPlayer.x = newX;
+        localPlayer.y = newY;
+        ws.send(JSON.stringify({
+            type: 'move',
+            x: localPlayer.x,
+            y: localPlayer.y,
+            angle: localPlayer.angle
+        }));
     }
 }
 
