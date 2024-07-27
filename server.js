@@ -83,6 +83,8 @@ function checkStarCollision(player) {
         player.tier++;
         player.health = shipTiers[player.tier].health;
         player.damage = shipTiers[player.tier].damage;
+        const ws = Array.from(players.entries()).find(([_, p]) => p.id === player.id)[0];
+        ws.send(JSON.stringify({ type: 'levelUp', newTier: player.tier, shipName: shipTiers[player.tier].name }));
       }
       return false;
     }

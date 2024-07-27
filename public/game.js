@@ -67,6 +67,8 @@ function connectWebSocket() {
                 localPlayer.health = data.health;
                 updateLevelUI();
             }
+        } else if (data.type === 'levelUp') {
+            showLevelUpMessage(data.newTier, data.shipName);
         }
     };
 
@@ -125,7 +127,30 @@ function gameLoop() {
         bullets.forEach(bullet => drawBullet(bullet));
     }
 
+    drawLevelUpMessage();
+
     requestAnimationFrame(gameLoop);
+}
+
+let levelUpMessage = null;
+let levelUpMessageTimer = 0;
+
+function showLevelUpMessage(newTier, shipName) {
+    levelUpMessage = `Leveled up to ${shipName}!`;
+    levelUpMessageTimer = 180; // Show message for 3 seconds (60 fps * 3)
+}
+
+function drawLevelUpMessage() {
+    if (levelUpMessage && levelUpMessageTimer > 0) {
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(levelUpMessage, canvas.width / 2, 50);
+        levelUpMessageTimer--;
+        if (levelUpMessageTimer === 0) {
+            levelUpMessage = null;
+        }
+    }
 }
 
 function updateLevelUI() {
