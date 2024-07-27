@@ -17,6 +17,7 @@ const players = new Map();
 let nextPlayerId = 1;
 let stars = [];
 let bullets = [];
+let bullets = [];
 
 function generateStars() {
   stars = [];
@@ -55,8 +56,9 @@ wss.on('connection', (ws) => {
     } else if (data.type === 'rotate') {
       player.angle = data.angle;
     } else if (data.type === 'shoot') {
-      handleShooting(player);
+      handleShooting(player, data);
     }
+    updateBullets();
     broadcastGameState();
   });
 
@@ -156,7 +158,8 @@ function checkBulletCollisions(bullet) {
 function broadcastGameState() {
   const gameState = {
     players: Array.from(players.values()),
-    stars: stars
+    stars: stars,
+    bullets: bullets
   };
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
@@ -164,6 +167,11 @@ function broadcastGameState() {
     }
   });
 }
+
+setInterval(() => {
+  updateBullets();
+  broadcastGameState();
+}, 1000 / 60); // 60 FPS
 
 app.use(express.static('public'));
 
