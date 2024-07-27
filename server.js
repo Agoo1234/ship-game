@@ -16,6 +16,7 @@ const shipTiers = [
 const players = new Map();
 let nextPlayerId = 1;
 let stars = [];
+let bullets = [];
 
 function generateStars() {
   stars = [];
@@ -89,19 +90,50 @@ function checkStarCollision(player) {
   }
 }
 
-function handleShooting(player) {
+function handleShooting(player, data) {
   const now = Date.now();
   if (now - player.lastShot > 500) { // 500ms cooldown
     player.lastShot = now;
     const bullet = {
-      x: player.x + Math.cos(player.angle) * 20,
-      y: player.y + Math.sin(player.angle) * 20,
-      angle: player.angle,
+      x: data.x,
+      y: data.y,
+      angle: data.angle,
+      speed: data.speed,
       damage: player.damage,
       playerId: player.id
     };
-    checkBulletCollisions(bullet);
+    bullets.push(bullet);
   }
+}
+
+function updateBullets() {
+  bullets = bullets.filter(bullet => {
+    bullet.x += Math.cos(bullet.angle) * bullet.speed;
+    bullet.y += Math.sin(bullet.angle) * bullet.speed;
+    
+    if (bullet.x < 0 || bullet.x > 800 || bullet.y < 0 || bullet.y > 600) {
+      return false;
+    }
+    
+    let hit = false;
+    players.forEach((player, ws) => {
+      if (player.id !== bullet.playerId) {
+        const dx = player.x - bullet.x;
+        const dy = player.y - bullet.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < 20) {
+          player.health -= bullet.damage;
+          if (player.health <= 0) {
+            ws.send(JSON.stringify({ type: 'dead' }));
+            players.delete(ws);
+          }
+          hit = true;
+        }
+      }
+    });
+    
+    return !hit;
+  });
 }
 
 function checkBulletCollisions(bullet) {
