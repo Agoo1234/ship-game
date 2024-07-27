@@ -201,6 +201,26 @@ function checkBulletCollisions(bullet) {
   });
 }
 
+function handleDamage(player, damage) {
+  if (player.shieldHealth > 0) {
+    player.shieldHealth = Math.max(0, player.shieldHealth - damage);
+    if (player.shieldHealth === 0) {
+      player.health = Math.max(0, player.health - damage);
+    }
+  } else {
+    player.health = Math.max(0, player.health - damage);
+  }
+}
+
+function handleLevelUp(player) {
+  player.tier++;
+  player.health = SHIP_TIERS[player.tier].health;
+  player.maxHealth = SHIP_TIERS[player.tier].health;
+  player.damage = SHIP_TIERS[player.tier].damage;
+  player.trait = SHIP_TIERS[player.tier].trait;
+  player.shieldHealth = SHIP_TIERS[player.tier].trait === 'Shield' ? 50 : 0;
+}
+
 function broadcastGameState() {
   const gameState = {
     type: 'gameState',
