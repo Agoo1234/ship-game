@@ -1,17 +1,23 @@
 // Import constants from the global GAME_CONSTANTS object or use fallback values
 const {
-    SHIP_TIERS = [
-        { name: 'Scout', color: '#fff', health: 100, trait: 'Fast Reload', expToNextLevel: 100 },
-        { name: 'Fighter', color: '#ff0', health: 150, trait: 'Triple Shot', expToNextLevel: 250 },
-        { name: 'Destroyer', color: '#0ff', health: 200, trait: 'Shield', expToNextLevel: 500 },
-        { name: 'Battleship', color: '#f0f', health: 300, trait: 'Heavy Bullet', expToNextLevel: 1000 },
-        { name: 'Dreadnought', color: '#0f0', health: 500, trait: 'Rear Shot', expToNextLevel: 2000 },
-        { name: 'Titan', color: '#f00', health: 1000, trait: 'All Traits', expToNextLevel: Infinity }
-    ],
+    SHIP_TIERS,
     BULLET_SPEED = 10,
     MINIMAP_SIZE = 150,
     LEVEL_UP_MESSAGE_DURATION = 180
 } = window.GAME_CONSTANTS || {};
+
+// Fallback values for SHIP_TIERS if not defined in GAME_CONSTANTS
+const DEFAULT_SHIP_TIERS = [
+    { name: 'Scout', color: '#fff', health: 100, trait: 'Fast Reload', expToNextLevel: 100 },
+    { name: 'Fighter', color: '#ff0', health: 150, trait: 'Triple Shot', expToNextLevel: 250 },
+    { name: 'Destroyer', color: '#0ff', health: 200, trait: 'Shield', expToNextLevel: 500 },
+    { name: 'Battleship', color: '#f0f', health: 300, trait: 'Heavy Bullet', expToNextLevel: 1000 },
+    { name: 'Dreadnought', color: '#0f0', health: 500, trait: 'Rear Shot', expToNextLevel: 2000 },
+    { name: 'Titan', color: '#f00', health: 1000, trait: 'All Traits', expToNextLevel: Infinity }
+];
+
+// Use SHIP_TIERS from GAME_CONSTANTS if available, otherwise use the default
+const SHIP_TIERS = window.GAME_CONSTANTS?.SHIP_TIERS || DEFAULT_SHIP_TIERS;
 
 // Use the MAP constant from window.GAME_CONSTANTS or fallback to a default value
 const MAP = window.GAME_CONSTANTS?.MAP || { width: 4000, height: 3000 };
