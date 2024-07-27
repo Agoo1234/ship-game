@@ -149,13 +149,17 @@ function updateBullets() {
         if (distance < 20) {
           handleDamage(player, bullet.damage, ws);
           const shooter = Array.from(players.values()).find(p => p.id === bullet.playerId);
-          if (shooter && player.health <= 0) {
-            shooter.exp += 50; // Give XP for killing a player
-            if (shooter.exp >= SHIP_TIERS[shooter.tier].expToNextLevel && shooter.tier < SHIP_TIERS.length - 1) {
-              handleLevelUp(shooter);
-              const shooterWs = Array.from(players.entries()).find(([_, p]) => p.id === shooter.id)[0];
-              shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: SHIP_TIERS[shooter.tier].name }));
+          if (shooter) {
+            if (player.health <= 0) {
+              shooter.exp += 50; // Give XP for killing a player
+              if (shooter.exp >= SHIP_TIERS[shooter.tier].expToNextLevel && shooter.tier < SHIP_TIERS.length - 1) {
+                handleLevelUp(shooter);
+                const shooterWs = Array.from(players.entries()).find(([_, p]) => p.id === shooter.id)[0];
+                shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: SHIP_TIERS[shooter.tier].name }));
+              }
             }
+            // Always give some XP for hitting a player
+            shooter.exp += 5;
           }
           hit = true;
         }
@@ -207,17 +211,20 @@ function handleDamage(player, damage, ws) {
     return; // 30% chance to completely block damage
   }
   
+  let actualDamage = damage;
   if (player.shieldHealth > 0) {
-    const remainingDamage = Math.max(0, damage - player.shieldHealth);
-    player.shieldHealth = Math.max(0, player.shieldHealth - damage);
-    if (remainingDamage > 0) {
-      player.health = Math.max(0, player.health - remainingDamage);
+    if (player.shieldHealth >= damage) {
+      player.shieldHealth -= damage;
+      actualDamage = 0;
+    } else {
+      actualDamage = damage - player.shieldHealth;
+      player.shieldHealth = 0;
     }
-  } else {
-    player.health = Math.max(0, player.health - damage);
   }
+  
+  player.health = Math.max(0, player.health - actualDamage);
 
-  console.log(`Player ${player.username} took ${damage} damage. Health: ${player.health}, Shield: ${player.shieldHealth}`);
+  console.log(`Player ${player.username} took ${actualDamage} damage. Health: ${player.health}, Shield: ${player.shieldHealth}`);
 
   if (player.health <= 0) {
     console.log(`Player ${player.username} has died`);
@@ -232,6 +239,8 @@ function handleDamage(player, damage, ws) {
       shieldHealth: player.shieldHealth 
     }));
   }
+  
+  broadcastGameState(); // Ensure all clients are updated after damage
 }
 
 function respawnPlayer(player, ws) {
