@@ -88,8 +88,7 @@ function updateLevelUI() {
         const currentTier = shipTiers[localPlayer.tier];
         const nextTier = shipTiers[localPlayer.tier + 1];
         if (nextTier) {
-            const progress = (localPlayer.exp - currentTier.expToNextLevel) / (nextTier.expToNextLevel - currentTier.expTo
-NextLevel) * 100;
+            const progress = (localPlayer.exp - currentTier.expToNextLevel) / (nextTier.expToNextLevel - currentTier.expToNextLevel) * 100;
             expBar.style.width = `${progress}%`;
         } else {
             expBar.style.width = '100%';
