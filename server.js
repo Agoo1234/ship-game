@@ -32,29 +32,34 @@ function generateStars() {
 generateStars();
 
 wss.on('connection', (ws) => {
-  const playerId = nextPlayerId++;
-  const player = {
-    id: playerId,
-    x: Math.random() * 800,
-    y: Math.random() * 600,
-    angle: 0,
-    tier: 0,
-    exp: 0,
-    health: shipTiers[0].health,
-    damage: shipTiers[0].damage,
-    lastShot: 0
-  };
-  players.set(ws, player);
-
   ws.on('message', (message) => {
     const data = JSON.parse(message);
-    if (data.type === 'move') {
+    if (data.type === 'join') {
+      const playerId = nextPlayerId++;
+      const player = {
+        id: playerId,
+        username: data.username,
+        x: Math.random() * 800,
+        y: Math.random() * 600,
+        angle: 0,
+        tier: 0,
+        exp: 0,
+        health: shipTiers[0].health,
+        damage: shipTiers[0].damage,
+        lastShot: 0
+      };
+      players.set(ws, player);
+      broadcastGameState();
+    } else if (data.type === 'move') {
+      const player = players.get(ws);
       player.x = data.x;
       player.y = data.y;
       checkStarCollision(player);
     } else if (data.type === 'rotate') {
+      const player = players.get(ws);
       player.angle = data.angle;
     } else if (data.type === 'shoot') {
+      const player = players.get(ws);
       handleShooting(player, data);
     }
     updateBullets();
@@ -65,8 +70,6 @@ wss.on('connection', (ws) => {
     players.delete(ws);
     broadcastGameState();
   });
-
-  broadcastGameState();
 });
 
 function checkStarCollision(player) {

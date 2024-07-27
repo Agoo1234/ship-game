@@ -4,43 +4,69 @@ const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 600;
 
-const ws = new WebSocket(window.location.protocol === 'file:' ? 'ws://localhost:3000' : `ws://${window.location.host}`);
+const introScreen = document.getElementById('introScreen');
+const gameContainer = document.getElementById('gameContainer');
+const usernameInput = document.getElementById('usernameInput');
+const startButton = document.getElementById('startButton');
 
+let ws;
 let players = [];
 let stars = [];
 let localPlayer = null;
 let keys = {};
 
 const shipTiers = [
-  { name: 'Scout', color: '#fff' },
-  { name: 'Fighter', color: '#ff0' },
-  { name: 'Destroyer', color: '#0ff' },
-  { name: 'Battleship', color: '#f0f' }
+  { name: 'Scout', color: '#fff', health: 100 },
+  { name: 'Fighter', color: '#ff0', health: 150 },
+  { name: 'Destroyer', color: '#0ff', health: 200 },
+  { name: 'Battleship', color: '#f0f', health: 300 }
 ];
 
 const SPEED = 5;
 
-ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data.type === 'dead') {
-        showDeathScreen();
-    } else if (data.type === 'gameState') {
-        players = data.players;
-        stars = data.stars;
-        bullets = data.bullets;
-        if (!localPlayer) {
-            localPlayer = players.find(p => p.id === players[players.length - 1].id);
-        } else {
-            localPlayer = players.find(p => p.id === localPlayer.id);
-        }
-        updateLevelUI();
-    } else if (data.type === 'hit') {
-        if (localPlayer) {
-            localPlayer.health = data.health;
-            updateLevelUI();
-        }
+startButton.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
+    if (username) {
+        startGame(username);
+    } else {
+        alert('Please enter a username');
     }
-};
+});
+
+function startGame(username) {
+    introScreen.style.display = 'none';
+    gameContainer.style.display = 'block';
+
+    ws = new WebSocket(window.location.protocol === 'file:' ? 'ws://localhost:3000' : `ws://${window.location.host}`);
+
+    ws.onopen = () => {
+        ws.send(JSON.stringify({ type: 'join', username: username }));
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'dead') {
+            showDeathScreen();
+        } else if (data.type === 'gameState') {
+            players = data.players;
+            stars = data.stars;
+            bullets = data.bullets;
+            if (!localPlayer) {
+                localPlayer = players.find(p => p.username === username);
+            } else {
+                localPlayer = players.find(p => p.id === localPlayer.id);
+            }
+            updateLevelUI();
+        } else if (data.type === 'hit') {
+            if (localPlayer && data.id === localPlayer.id) {
+                localPlayer.health = data.health;
+                updateLevelUI();
+            }
+        }
+    };
+
+    gameLoop();
+}
 
 function drawShip(player) {
     ctx.save();
@@ -69,11 +95,11 @@ function drawShip(player) {
     const currentHealthWidth = (player.health / shipTiers[player.tier].health) * healthBarWidth;
     ctx.fillRect(player.x - healthBarWidth / 2, healthBarY, currentHealthWidth, healthBarHeight);
     
-    // Draw player name or ID above health bar
+    // Draw player username above health bar
     ctx.fillStyle = 'white';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(player.id, player.x, healthBarY - 5);
+    ctx.fillText(player.username, player.x, healthBarY - 5);
 }
 
 function drawStar(star) {

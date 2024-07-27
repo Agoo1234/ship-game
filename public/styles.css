@@ -10,6 +10,34 @@ body {
     font-family: Arial, sans-serif;
 }
 
+#introScreen {
+    text-align: center;
+}
+
+#introScreen h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+#usernameInput {
+    font-size: 18px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+}
+
+#startButton {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #0f0;
+    color: #000;
+    border: none;
+    cursor: pointer;
+}
+
+#startButton:hover {
+    background-color: #0c0;
+}
+
 #gameContainer {
     position: relative;
 }
