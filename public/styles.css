@@ -27,7 +27,7 @@ body {
     border-radius: 5px;
 }
 
-#levelInfo, #shipName {
+#levelInfo, #shipName, #healthInfo {
     margin-bottom: 5px;
 }
 
@@ -44,4 +44,37 @@ body {
     background-color: #0f0;
     width: 0;
     transition: width 0.3s ease-in-out;
+}
+
+#deathScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#deathScreen h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+#deathScreen button {
+    font-size: 24px;
+    padding: 10px 20px;
+    background-color: #f00;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#deathScreen button:hover {
+    background-color: #ff3333;
 }
