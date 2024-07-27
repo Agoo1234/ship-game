@@ -100,18 +100,20 @@ function handleShooting(player, data) {
   const cooldown = player.trait === 'Fast Reload' || player.trait === 'All Traits' ? 250 : 500; // 250ms cooldown for Fast Reload trait
   if (now - player.lastShot > cooldown) {
     player.lastShot = now;
+    const baseDamage = player.damage || SHIP_TIERS[player.tier].damage;
+    const bulletDamage = player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? baseDamage * 1.5 : baseDamage;
     const bulletData = {
       x: data.x,
       y: data.y,
       angle: data.angle,
       speed: data.speed,
-      damage: player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? player.damage * 1.5 : player.damage,
+      damage: Math.max(1, Math.round(bulletDamage)), // Ensure damage is at least 1 and rounded
       playerId: player.id,
       size: player.trait === 'Heavy Bullet' || player.trait === 'All Traits' ? 6 : 3
     };
     bullets.push(bulletData);
 
-    console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet`);
+    console.log(`Player ${player.username} (Tier: ${player.tier}, Trait: ${player.trait}) fired a bullet with damage: ${bulletData.damage}`);
 
     if (player.trait === 'Double Shot' || player.trait === 'All Traits') {
       console.log(`Double Shot trait activated for player ${player.username}`);
