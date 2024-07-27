@@ -141,25 +141,22 @@ function updateBullets() {
         const dy = player.y - bullet.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < 20) {
-          if (player.trait !== 'shield' || Math.random() > 0.3) { // 30% chance to block for shield trait
-            player.health -= bullet.damage;
+          if (player.trait !== 'Shield' || Math.random() > 0.3) { // 30% chance to block for shield trait
+            handleDamage(player, bullet.damage);
             if (player.health <= 0) {
               const shooter = Array.from(players.values()).find(p => p.id === bullet.playerId);
               if (shooter) {
                 shooter.exp += 50; // Give XP for killing a player
-                if (shooter.exp >= shipTiers[shooter.tier].expToNextLevel && shooter.tier < shipTiers.length - 1) {
-                  shooter.tier++;
-                  shooter.health = shipTiers[shooter.tier].health;
-                  shooter.damage = shipTiers[shooter.tier].damage;
-                  shooter.trait = shipTiers[shooter.tier].trait;
+                if (shooter.exp >= SHIP_TIERS[shooter.tier].expToNextLevel && shooter.tier < SHIP_TIERS.length - 1) {
+                  handleLevelUp(shooter);
                   const shooterWs = Array.from(players.entries()).find(([_, p]) => p.id === shooter.id)[0];
-                  shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: shipTiers[shooter.tier].name }));
+                  shooterWs.send(JSON.stringify({ type: 'levelUp', newTier: shooter.tier, shipName: SHIP_TIERS[shooter.tier].name }));
                 }
               }
               ws.send(JSON.stringify({ type: 'dead' }));
               players.delete(ws);
             } else {
-              ws.send(JSON.stringify({ type: 'hit', health: player.health }));
+              ws.send(JSON.stringify({ type: 'hit', health: player.health, shieldHealth: player.shieldHealth }));
             }
             hit = true;
           }
